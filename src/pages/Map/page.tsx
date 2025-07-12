@@ -416,7 +416,9 @@ const MapPage = () => {
                       <br />
                       �👥 {activity.people} Persons
                       <br />
-                      🕒 {activity.time}
+                      � {(activity as any).date || 'No date set'}
+                      <br />
+                      �🕒 {activity.time}
                       <br />
                       <span className="popup-event-type">{activity.type}</span>
                       <br />

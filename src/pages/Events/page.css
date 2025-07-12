@@ -434,6 +434,28 @@
   display: block;
 }
 
+/* Date input styles */
+.date-hint {
+  color: var(--mittweida-black-light);
+  font-style: italic;
+  text-align: center;
+  display: block;
+  margin-top: 4px;
+}
+
+.events-input[type="date"] {
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.events-input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  color: var(--mittweida-gold);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-small);
+}
+
 /* Events Liste Styles */
 .events-list-section {
   margin-top: 40px;

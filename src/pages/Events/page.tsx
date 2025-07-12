@@ -22,6 +22,7 @@ const EventsPage = () => {
     type: 'Walking',
     participants: 1,
     time: '',
+    date: '',  // ✅ Neu: Datum im Format YYYY-MM-DD
     position: null as [number, number] | null
   });
 
@@ -66,6 +67,7 @@ const EventsPage = () => {
         position: [50.9866, 12.971] as [number, number], // Dummy position, as backend doesn't store geo data yet
         participants: event.participants || 0,
         time: event.time,
+        date: event.date || new Date().toISOString().split('T')[0], // ✅ Datum übernehmen oder heutiges Datum als Fallback
         type: event.type || 'Walking'
       }));
       
@@ -159,6 +161,21 @@ const EventsPage = () => {
       return;
     }
     
+    if (!form.date) {
+      alert('⚠️ Please select a date for the event.');
+      return;
+    }
+    
+    // Überprüfe, dass das Datum nicht in der Vergangenheit liegt
+    const selectedDate = new Date(form.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      alert('⚠️ Please select a date that is today or in the future.');
+      return;
+    }
+    
     try {
       console.log('🚀 Creating event with data:', form);
       console.log('🔍 Form participants value:', form.participants, 'Type:', typeof form.participants);
@@ -179,6 +196,7 @@ const EventsPage = () => {
         type: 'Walking',
         participants: 1,
         time: '',
+        date: '',  // ✅ Datum auch zurücksetzen
         position: null
       });
       setTimeParts(['', '', '', '']);
@@ -315,6 +333,21 @@ const EventsPage = () => {
           <small className="time-hint">Format: HH:mm (e.g. 14:30)</small>
         </div>
 
+        {/* 6. Datum */}
+        <div className="form-group">
+          <label className="required-label">Date (Required):</label>
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({...form, date: e.target.value})}
+            className="events-input"
+            min={new Date().toISOString().split('T')[0]}
+            title="Wähle das Event-Datum"
+            required
+          />
+          <small className="date-hint">Format: YYYY-MM-DD (minimum: today)</small>
+        </div>
+
         <button 
           type="submit"
           className="submit-button"
@@ -345,7 +378,7 @@ const EventsPage = () => {
               <div key={event.id} className="events-list-item">
                 <div className="event-info">
                   <h3>{event.name}</h3>
-                  <p>🏃 {event.type} • 🕐 {event.time} • 👥 {event.participants} participants</p>
+                  <p>🏃 {event.type} • � {event.date} • �🕐 {event.time} • 👥 {event.participants} participants</p>
                   <p>📍 Mittweida [{event.position[0].toFixed(3)}, {event.position[1].toFixed(3)}]</p>
                   <small className="event-id">Backend-ID: {event.id}</small>
                 </div>
