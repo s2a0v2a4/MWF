@@ -211,3 +211,26 @@ const EventAdmin = () => {
 };
 
 export default EventAdmin;
+
+export type BackendEvent = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  time: string;
+  type: string;
+  participants: number;
+  latitude: number;              // ✅ Echte GPS-Koordinaten
+  longitude: number;             // ✅ Echte GPS-Koordinaten
+}
+
+export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEvent, 'id'> => ({
+  title: frontendEvent.name,
+  description: frontendEvent.description || `${frontendEvent.type} Event in Mittweida`,
+  category: frontendEvent.category || typeToCategoryMap[frontendEvent.type] || 'Sport',
+  time: frontendEvent.time,
+  type: frontendEvent.type,
+  participants: frontendEvent.participants || 0,
+  latitude: frontendEvent.position[0],   // ✅ GPS aus position array
+  longitude: frontendEvent.position[1]   // ✅ GPS aus position array
+})

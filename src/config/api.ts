@@ -60,33 +60,44 @@ export type FrontendEvent = {
   participants: number;
   time: string;
   type: string;
+  description?: string;          // ✅ Neu hinzugefügt
+  category?: string;             // ✅ Neu hinzugefügt
 }
 
-// 📊 Backend Event Type
+// 📊 Backend Event Type (Updated to match backend structure)
 export type BackendEvent = {
-  id?: number;
+  id: number;
   title: string;
   description: string;
   category: string;
   time: string;
-  type?: string;
-  participants?: number;
+  type: string;
+  participants: number;
+  latitude: number;              // ✅ Echte GPS-Koordinaten vom Backend
+  longitude: number;             // ✅ Echte GPS-Koordinaten vom Backend
 }
 
 // 🔄 Frontend → Backend Mapping
-export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEvent, 'id' | 'participants'> => ({
+export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEvent, 'id'> => ({
   title: frontendEvent.name,
-  description: `${frontendEvent.type} Event in Mittweida`, // Generated description
-  category: typeToCategoryMap[frontendEvent.type] || 'Sport',
+  description: frontendEvent.description || `${frontendEvent.type} Event in Mittweida`, // Use provided or generate description
+  category: frontendEvent.category || typeToCategoryMap[frontendEvent.type] || 'Sport',
   time: frontendEvent.time,
-  type: frontendEvent.type
+  type: frontendEvent.type,
+  participants: frontendEvent.participants,  // ✅ Direkt verwenden ohne Fallback
+  latitude: frontendEvent.position[0],   // GPS-Koordinaten aus position array
+  longitude: frontendEvent.position[1]   // GPS-Koordinaten aus position array
 })
 
 // 🚀 Event API Functions
 export const createEvent = async (eventData: FrontendEvent): Promise<BackendEvent> => {
+  console.log('🔍 Frontend Event Data before mapping:', eventData);
+  console.log('🔍 Participants value:', eventData.participants, 'Type:', typeof eventData.participants);
+  
   const backendData = mapToBackendFormat(eventData)
   
   console.log('🔄 Mapping Frontend → Backend:', { frontendEvent: eventData, backendEvent: backendData })
+  console.log('🔍 Backend participants value:', backendData.participants, 'Type:', typeof backendData.participants);
   
   const response = await apiCall('/events', {
     method: 'POST',
@@ -105,7 +116,10 @@ export const createEvent = async (eventData: FrontendEvent): Promise<BackendEven
 
 export const getEvents = async (): Promise<BackendEvent[]> => {
   console.log('🔄 getEvents: Starting to fetch events...')
-  const response = await apiCall('/events')
+  
+  // Add cache-busting timestamp
+  const timestamp = new Date().getTime();
+  const response = await apiCall(`/events?t=${timestamp}`)
   
   console.log('📡 getEvents: Response received:', {
     ok: response.ok,
@@ -121,8 +135,26 @@ export const getEvents = async (): Promise<BackendEvent[]> => {
   }
   
   const data = await response.json()
-  console.log('✅ getEvents: Successfully parsed JSON:', data)
-  return data
+  console.log('✅ getEvents: Raw data received:', data)
+  console.log('✅ getEvents: Data type:', typeof data)
+  console.log('✅ getEvents: Is array:', Array.isArray(data))
+  
+  // Handle both array and single object responses
+  let events: BackendEvent[] = []
+  if (Array.isArray(data)) {
+    events = data
+  } else if (data && typeof data === 'object') {
+    // If backend returns a single event object, wrap it in an array
+    console.log('⚠️ getEvents: Backend returned single object, wrapping in array')
+    events = [data]
+  } else {
+    console.warn('⚠️ getEvents: Unexpected data format, returning empty array')
+  }
+  
+  console.log('✅ getEvents: Final events array:', events)
+  console.log('✅ getEvents: Events count:', events.length)
+  console.log('✅ getEvents: Event IDs:', events.map(e => e.id).join(', '))
+  return events
 }
 
 // 🤝 Join Event Function

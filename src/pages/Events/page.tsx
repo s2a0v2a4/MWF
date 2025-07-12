@@ -161,6 +161,8 @@ const EventsPage = () => {
     
     try {
       console.log('🚀 Creating event with data:', form);
+      console.log('🔍 Form participants value:', form.participants, 'Type:', typeof form.participants);
+      console.log('🔍 Full form object:', JSON.stringify(form, null, 2));
       
       // Event an Backend senden
       const newEvent = await createEvent(form as FrontendEvent);

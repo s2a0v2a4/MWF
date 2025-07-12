@@ -4,7 +4,7 @@ import "./_components/MapPage.css";
 import L from 'leaflet';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFilteredEvents } from '../../hooks/useInterests';
+import { getEvents, type BackendEvent } from '../../config/api';
 import { interests } from '../../data/interests';
 const activityIcons: Record<string, string> = {
   Swimming: '/icons/outline/swimming.svg',
@@ -37,6 +37,8 @@ type Activity = {
   people: number;
   time: string;
   type: string;
+  description: string;
+  category: string;
 };
 const createIcon = (activity: Activity) => {
   const color = activityColors[activity.type] || '#555';
@@ -75,25 +77,81 @@ const MapPage = () => {
     () => localStorage.getItem('darkMode') === 'true'
   );
 
-  // Use the new hook for filtered events
-  const { events: backendEvents, userInterests, refreshInterests } = useFilteredEvents();
+  // Backend Events State
+  const [backendEvents, setBackendEvents] = useState<BackendEvent[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [eventLoadError, setEventLoadError] = useState<string | null>(null);
 
-  // Debug: Log Backend Events
+  // 🔄 Load Events from Backend
+  const loadEventsFromBackend = async () => {
+    try {
+      setIsLoadingEvents(true);
+      setEventLoadError(null);
+      console.log('🗺️ Loading events from backend...');
+      
+      const events = await getEvents();
+      console.log('🗺️ Backend events received:', events);
+      console.log('🗺️ Backend events count:', events?.length || 0);
+      
+      const eventsArray = Array.isArray(events) ? events : [];
+      setBackendEvents(eventsArray);
+      
+    } catch (error) {
+      console.error('❌ Error loading events for map:', error);
+      setEventLoadError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  };
+
+  // Load events on component mount and setup auto-refresh
   useEffect(() => {
-    console.log('🗺️ Map: Backend events received:', backendEvents);
-    console.log('🗺️ Map: Backend events count:', Array.isArray(backendEvents) ? backendEvents.length : 0);
-  }, [backendEvents]);
+    loadEventsFromBackend();
 
-  // Convert Backend-Events to Frontend-Format
+    // Auto-refresh when window gets focus (e.g., returning from event creation)
+    const handleFocus = () => {
+      console.log('🔄 Map: Window focused, refreshing events...');
+      loadEventsFromBackend();
+    };
+
+    // Listen for custom event when new events are created
+    const handleEventCreated = () => {
+      console.log('🔄 Map: New event created, refreshing...');
+      loadEventsFromBackend();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('eventCreated', handleEventCreated);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('eventCreated', handleEventCreated);
+    };
+  }, []);
+
+  // Convert Backend-Events to Frontend-Format mit echten oder unique Positionen
   const activities = Array.isArray(backendEvents)
-    ? backendEvents.map((e: any) => ({
-        id: e.id?.toString() || Math.random().toString(),
-        name: e.title || e.name,          // Backend verwendet 'title', Frontend erwartet 'name'
-        type: e.type || 'Walking',        // Event type for icon mapping
-        people: e.participants || 0,     // Number of participants
-        time: e.time || '00:00',         // Event time
-        position: e.position || [50.9866, 12.9716] as [number, number], // GPS-Position (Fallback: Mittweida)
-      }))
+    ? backendEvents.map((e: BackendEvent, index: number) => {
+        console.log(`🗺️ Converting backend event ${index + 1}:`, e);
+        
+        // Use real coordinates from backend (now always available)
+        const eventPosition: [number, number] = [e.latitude, e.longitude];
+        console.log(`✅ Using real GPS coordinates for map event ${index + 1}:`, eventPosition);
+        
+        const activity = {
+          id: e.id.toString(),
+          name: e.title,
+          type: e.type,
+          people: e.participants,
+          time: e.time,
+          position: eventPosition,
+          description: e.description,
+          category: e.category,
+        };
+        
+        console.log(`🗺️ Event ${index + 1} final position:`, activity.position);
+        return activity;
+      })
     : [];
 
   // Debug: Log converted activities
@@ -102,50 +160,15 @@ const MapPage = () => {
     console.log('🗺️ Map: Activities count:', activities.length);
   }, [activities]);
 
-  // Create tags based on selected interests from backend
+  // Create tags based on activity types
   const availableTags = React.useMemo(() => {
-    console.log('🔄 Map: User interests from backend:', userInterests);
+    console.log('🔄 Map: Creating tags from activities');
     
-    // Wenn keine Interessen ausgewählt sind, zeige alle verfügbaren Activity-Typen
-    if (!userInterests || userInterests.length === 0) {
-      console.log('📝 Map: No interests selected, showing all activity types');
-      const uniqueTypes = [...new Set(activities.map(a => a.type))];
-      console.log('🏷️ Map: All available activity types:', uniqueTypes);
-      return uniqueTypes;
-    }
-    
-    // Hole die Namen der ausgewählten Interessen direkt
-    const selectedInterestNames = userInterests
-      .map(id => interests.find(interest => interest.id === id))
-      .filter(interest => interest && interest.category !== null)
-      .map(interest => interest!.name);
-    
-    console.log('🏷️ Map: Generated tags from interests:', selectedInterestNames);
-    return selectedInterestNames;
-  }, [userInterests, activities]);
-  
-  // Erkenne Änderungen an den Interessen über localStorage
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'interestsChanged' && e.newValue === 'true') {
-        refreshInterests();
-        // Reset the flag
-        localStorage.removeItem('interestsChanged');
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Prüfe initial, ob Interessen geändert wurden
-    if (localStorage.getItem('interestsChanged') === 'true') {
-      refreshInterests();
-      localStorage.removeItem('interestsChanged');
-    }
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [refreshInterests]);
+    // Hole alle verfügbaren Activity-Typen aus den Events
+    const uniqueTypes = [...new Set(activities.map(a => a.type))];
+    console.log('🏷️ Map: Available activity types:', uniqueTypes);
+    return uniqueTypes;
+  }, [activities]);
   
   // Load saved events from localStorage
   useEffect(() => {
@@ -244,8 +267,26 @@ const MapPage = () => {
       <nav className={`top-nav ${darkMode ? 'darkmode' : ''}`}>
         <div className="nav-content">
           <span className={`nav-title ${darkMode ? 'darkmode' : ''}`}>
-            Mittweida Events Map
+            Mittweida Events Map ({activities.length} Events)
           </span>
+          <button
+            onClick={loadEventsFromBackend}
+            className="refresh-button"
+            style={{
+              background: isLoadingEvents ? '#6c757d' : '#007BFF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              marginRight: '10px',
+              cursor: isLoadingEvents ? 'not-allowed' : 'pointer',
+              fontSize: '14px'
+            }}
+            title="Events vom Backend neu laden"
+            disabled={isLoadingEvents}
+          >
+            {isLoadingEvents ? '⏳ Loading...' : '🔄 Refresh'}
+          </button>
           <input
             type="text"
             placeholder="Suche..."
@@ -280,7 +321,21 @@ const MapPage = () => {
           </div>
         </div>
         <div className="tags-container">
-          {availableTags.map((tag) => (
+          {/* Event Status Info */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            marginBottom: '10px',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            <span>📍 Events geladen: {activities.length}</span>
+            {isLoadingEvents && <span>⏳ Loading...</span>}
+            {eventLoadError && <span style={{ color: '#dc3545' }}>❌ {eventLoadError}</span>}
+          </div>
+          
+          {availableTags.map((tag: string) => (
             <button
               key={tag}
               onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
@@ -289,9 +344,12 @@ const MapPage = () => {
               {tag}
             </button>
           ))}
-          {availableTags.length === 0 && (
+          {availableTags.length === 0 && !isLoadingEvents && (
             <div className="no-interests-message">
-              Keine Interessen ausgewählt - besuchen Sie die Interessen-Seite
+              {activities.length === 0 
+                ? "Keine Events vom Backend geladen" 
+                : "Alle Event-Typen werden angezeigt"
+              }
             </div>
           )}
         </div>
@@ -352,7 +410,11 @@ const MapPage = () => {
                     <div className="popup-content">
                       <span className="popup-event-name">{activity.name}</span>
                       <br />
-                      👥 {activity.people} Persons
+                      � {activity.description}
+                      <br />
+                      🏷️ {activity.category}
+                      <br />
+                      �👥 {activity.people} Persons
                       <br />
                       🕒 {activity.time}
                       <br />
