@@ -1,0 +1,7 @@
+| Nr. | Name                           | Typ               | Zweck                                    |
+| --- | ------------------------------ | ----------------- | ---------------------------------------- |
+| 1   | `Card` renders children        | Unit              | Basiskomponenten funktionieren           |
+| 2   | `Profile` zeigt Daten          | Component         | Benutzerprofil wird korrekt gerendert    |
+| 3   | `CreateEventForm` funktioniert | Component + Input | Events können korrekt erstellt werden    |
+| 4   | `JoinButton` funktioniert      | UI                | Beitreten zu Events klappt               |
+| 5   | `EventList` filtert Events     | Logic + Render    | Suchen & Filtern von Events funktioniert |

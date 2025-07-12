@@ -1,0 +1,381 @@
+.map-container {
+  height: 100vh;
+  width: 100vw;
+  background: #f7f8fa;
+  max-width: 100vw;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+  position: relative;
+}
+
+.map-container.darkmode {
+  background: #181a1b;
+}
+
+.top-nav {
+  width: 100vw;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 14px 0 8px 0;
+  margin-bottom: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.top-nav.darkmode {
+  background: #23272a;
+}
+
+.nav-content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  gap: 8px;
+  position: relative;
+}
+
+.nav-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.nav-title.darkmode {
+  color: #fff;
+}
+
+.search-input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 15px;
+  min-width: 0;
+  width: 100%;
+  max-width: 180px;
+  background: #fafbfc;
+  color: #222;
+  outline: none;
+  flex: 1;
+}
+
+.search-input.darkmode {
+  background: #23272a;
+  color: #fff;
+}
+
+.profile-button {
+  margin-left: 10px;
+  background: #fff;
+  border: 1.5px solid #ccc;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  font-size: 22px;
+  color: #222;
+  transition: background 0.2s;
+}
+
+.profile-button.darkmode {
+  background: #23272a;
+  color: #fff;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  min-width: 210px;
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  z-index: 2001;
+  padding: 10px 0;
+  color: #222;
+  font-size: 16px;
+}
+
+.profile-menu.darkmode {
+  background: #23272a;
+  color: #fff;
+}
+
+.profile-relative {
+  position: relative;
+}
+
+.menu-item {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 18px;
+  font-size: 16px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.menu-item-icon {
+  font-size: 20px;
+}
+
+.tags-container {
+  max-width: 900px;
+  margin: 10px auto 0 auto;
+  padding: 0 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  overflow-x: auto;
+}
+
+.tag-button {
+  padding: 5px 12px;
+  border-radius: 18px;
+  border: 1.5px solid #ccc;
+  background: #fff;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tag-button.selected {
+  border: 2px solid #6c63ff;
+  background: #f3f2ff;
+  color: #6c63ff;
+}
+
+.bottom-nav {
+  width: 100vw;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  padding: 8px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.bottom-nav.darkmode {
+  background: #23272a;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-bottom: 2.5px solid transparent;
+  transition: all 0.2s;
+  min-width: 70px;
+}
+
+.nav-button.active {
+  color: #6c63ff;
+  font-weight: 700;
+  border-bottom: 2.5px solid #6c63ff;
+}
+
+.create-event-button {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 8px 22px;
+  margin-left: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.create-event-icon {
+  font-size: 20px;
+}
+
+.main-content {
+  width: 100vw;
+  height: calc(100vh - 70px - 48px);
+  overflow-y: auto;
+  max-width: 100vw;
+  padding-top: 70px;
+  padding-bottom: 56px;
+}
+
+.map-container-leaflet {
+  height: 100%;
+  width: 100%;
+}
+
+.saved-events-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 8px 80px 8px;
+}
+
+.saved-events-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.no-events-message {
+  color: #888;
+  font-size: 15px;
+}
+
+.events-list {
+  list-style: none;
+  padding: 0;
+}
+
+.event-item {
+  color: #333;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-bottom: 14px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+}
+
+.event-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-name {
+  font-weight: bold;
+}
+
+.event-type {
+  color: #6c63ff;
+}
+
+.remove-button {
+  background: #ff4b4b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.select-location-button {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  background: #6c63ff;
+  color: #fff;
+  border-radius: 22px;
+  padding: 12px 28px;
+  font-weight: 600;
+  font-size: 17px;
+  box-shadow: 0 2px 8px rgba(108,99,255,0.13);
+  cursor: pointer;
+}
+
+.popup-content {
+  min-width: 160px;
+  font-size: 15px;
+}
+
+.popup-event-name {
+  font-weight: bold;
+}
+
+.popup-event-type {
+  color: #6c63ff;
+  font-weight: 500;
+}
+
+.popup-save-button {
+  margin-top: 8px;
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.popup-save-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.popup-join-button {
+  margin-top: 8px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.popup-join-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.event-blink-circle {
+  animation: blink 2s ease-in-out infinite alternate;
+}
+
+.leaflet-control-zoom {
+  margin-top: 80px !important;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}

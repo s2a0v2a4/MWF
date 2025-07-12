@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.app {
+  padding: 0;
+  background-color: #4CAF50;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-bar {
+  background-color: #388E3C;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  color: white;
+}
+
+.header-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.icon {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.activity-card {
+  background-color: white;
+  color: black;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  width: 90%;
+}
+
+.floating-button {
+  position: fixed;
+  bottom: 1rem;
+  background-color: #2e7d32;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 2rem;
+  border: none;
+}
