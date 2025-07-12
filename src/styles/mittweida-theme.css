@@ -1,0 +1,76 @@
+/* 
+ * MITTWEIDA DESIGN SYSTEM
+ * Basierend auf der Mittweida-Flagge: Gelb und Schwarz
+ * Optimiert für Lesbarkeit und Professionalität
+ */
+
+:root {
+  /* === PRIMÄRFARBEN (Mittweida-Flagge) === */
+  --mittweida-gold: #FFD700;      /* Flaggen-Gelb */
+  --mittweida-black: #1A1A1A;     /* Flaggen-Schwarz */
+  
+  /* === SEKUNDÄRFARBEN (Harmonische Abstufungen) === */
+  --mittweida-gold-light: #FFF176;    /* Helles Gelb */
+  --mittweida-gold-dark: #F57F17;     /* Dunkles Gelb/Orange */
+  --mittweida-gold-pale: #FFFDE7;     /* Sehr helles Gelb für Hintergründe */
+  
+  --mittweida-black-light: #424242;   /* Helles Schwarz/Grau */
+  --mittweida-black-dark: #000000;    /* Tiefes Schwarz */
+  --mittweida-black-pale: #F5F5F5;    /* Sehr helles Grau */
+  
+  /* === KOMPATIBILITÄTS-ALIASE === */
+  --color-primary: var(--mittweida-gold);
+  --color-primary-light: var(--mittweida-gold-light);
+  --color-primary-dark: var(--mittweida-gold-dark);
+  
+  --color-secondary: var(--mittweida-black);
+  --color-secondary-light: var(--mittweida-black-light);
+  --color-secondary-dark: var(--mittweida-black-dark);
+  
+  --color-accent: var(--mittweida-gold-dark);
+  --color-background: var(--mittweida-black-pale);
+  --color-surface: #FFFFFF;
+  
+  --color-text-primary: var(--mittweida-black);
+  --color-text-secondary: var(--mittweida-black-light);
+  --color-text-inverse: var(--mittweida-gold-pale);
+  
+  --color-border: #E0E0E0;
+  --color-border-active: var(--mittweida-gold);
+  
+  /* === AKZENTFARBEN === */
+  --accent-success: #2E7D32;      /* Grün für Erfolg */
+  --accent-error: #C62828;        /* Rot für Fehler */
+  --accent-warning: #F57C00;      /* Orange für Warnungen */
+  --accent-info: #1565C0;         /* Blau für Informationen */
+  
+  /* === NEUTRALE FARBEN === */
+  --neutral-white: #FFFFFF;
+  --neutral-light: #FAFAFA;
+  --neutral-medium: #E0E0E0;
+  --neutral-dark: #616161;
+  
+  /* === TEXTFARBEN === */
+  --text-primary: var(--mittweida-black);
+  --text-secondary: var(--mittweida-black-light);
+  --text-on-dark: var(--neutral-white);
+  --text-on-gold: var(--mittweida-black);
+  
+  /* === SCHATTEN === */
+  --shadow-light: 0 2px 4px rgba(26, 26, 26, 0.1);
+  --shadow-medium: 0 4px 8px rgba(26, 26, 26, 0.15);
+  --shadow-heavy: 0 8px 16px rgba(26, 26, 26, 0.2);
+  --shadow-large: 0 8px 16px rgba(26, 26, 26, 0.2);
+  
+  /* === BORDER RADIUS === */
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-xl: 16px;
+  
+  /* === TRANSITIONS === */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-base: 0.3s ease;
+}

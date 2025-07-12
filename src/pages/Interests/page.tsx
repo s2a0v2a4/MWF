@@ -1,35 +1,49 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { saveInterests } from './saveInterests';
+import { mutate } from 'swr';
+import { apiCall } from '../../config/api';
+import { interests } from '../../data/interests';
 import './InterestSelection.css';
-
-const interests = [
-  { id: 1, name: 'Wandern', icon: '🥾' },
-  { id: 2, name: 'Schwimmen', icon: '🏊‍♀️' },
-  { id: 3, name: 'Radfahren', icon: '🚴‍♂️' },
-  { id: 4, name: 'Picknick', icon: '🧺' },
-  { id: 5, name: 'Theater', icon: '🎭' },
-  { id: 6, name: 'Hunde', icon: '🐕' },
-  { id: 7, name: 'Musik', icon: '🎵' },
-  { id: 8, name: 'Kochen', icon: '👨‍🍳' },
-  { id: 9, name: 'Lesen', icon: '📚' },
-  { id: 10, name: 'Fotografie', icon: '📸' },
-  { id: 11, name: 'Gaming', icon: '🎮' },
-  { id: 12, name: 'Kunst', icon: '🎨' },
-  { id: 13, name: 'Reisen', icon: '✈️' },
-  { id: 14, name: 'Yoga', icon: '🧘‍♀️' },
-  { id: 15, name: 'Tanzen', icon: '💃' },
-  { id: 16, name: 'Fitness', icon: '💪' },
-  { id: 17, name: 'Filme', icon: '🎬' },
-  { id: 18, name: 'Kaffee', icon: '☕' },
-];
 
 export default function InterestSelectionPage() {
   const [selectedInterests, setSelectedInterests] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
+
+  // SWR-basierte Mutation Funktion für das Speichern der Interessen
+  const saveInterests = async (interestsToSave: number[]) => {
+    console.log('🔄 SWR Mutation: Saving interests:', interestsToSave);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await apiCall('/interests', {
+        method: 'POST',
+        body: JSON.stringify({ interests: interestsToSave }),
+      });
+      
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(`HTTP ${response.status}: ${result.error || result.message || 'Unknown error'}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ SWR Mutation: Successfully saved interests:', result);
+      
+      // SWR Cache für Interests invalidieren
+      await mutate('http://localhost:5000/api/interests');
+      
+      return result;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Unknown error');
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleInterest = (id: number) => {
     setSelectedInterests(prev => 
@@ -41,15 +55,14 @@ export default function InterestSelectionPage() {
 
   const handleSubmit = async () => {
     if (selectedInterests.length === 0) {
-      setError('Bitte wählen Sie mindestens ein Interesse aus.');
+      setError(new Error('Please select at least one interest.'));
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-
     try {
       await saveInterests(selectedInterests);
+      // Setze Flag für Map-Seite, dass Interessen geändert wurden
+      localStorage.setItem('interestsChanged', 'true');
       setShowSuccess(true);
       
       setTimeout(() => {
@@ -57,9 +70,7 @@ export default function InterestSelectionPage() {
       }, 2000);
     } catch (err) {
       console.error('Error saving interests:', err);
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten. Versuchen Sie es erneut.');
-    } finally {
-      setIsLoading(false);
+      // Error wird bereits in saveInterests gesetzt
     }
   };
 
@@ -79,12 +90,18 @@ export default function InterestSelectionPage() {
   return (
     <div className="interest-page">
       <div className="container">
-        <h1>Wählen Sie Ihre Interessen</h1>
-        <p className="subtitle">Mindestens ein Interesse auswählen</p>
+        <h1>Select Your Interests</h1>
+        <p className="subtitle">Select at least one interest</p>
         
         {error && (
           <div className="error-message">
-            {error}
+            {error.message}
+          </div>
+        )}
+
+        {!error && selectedInterests.length === 0 && (
+          <div className="validation-message">
+            Please select at least one interest.
           </div>
         )}
 

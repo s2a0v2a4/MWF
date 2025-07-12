@@ -3,8 +3,9 @@ import 'leaflet/dist/leaflet.css';
 import "./_components/MapPage.css";
 import L from 'leaflet';
 import React, { useEffect, useRef, useState } from 'react';
-import useSWR from 'swr';
 import { useNavigate } from 'react-router-dom';
+import { useFilteredEvents } from '../../hooks/useInterests';
+import { interests } from '../../data/interests';
 const activityIcons: Record<string, string> = {
   Swimming: '/icons/outline/swimming.svg',
   Picnic: '/icons/outline/picnic.svg',
@@ -12,6 +13,10 @@ const activityIcons: Record<string, string> = {
   Theater: '/icons/outline/theater.svg',
   Hiking: '/icons/outline/hiking.svg',
   Dog: '/icons/outline/dog.svg',
+  Walking: '/icons/outline/hiking.svg',    // Walking verwendet Hiking-Icon
+  Concert: '/icons/outline/theater.svg',   // Concert verwendet Theater-Icon
+  Exhibition: '/icons/outline/theater.svg', // Exhibition verwendet Theater-Icon
+  Sports: '/icons/outline/cycling.svg',    // Sports verwendet Cycling-Icon
 };
 const activityColors: Record<string, string> = {
   Swimming: '#007BFF',
@@ -20,6 +25,10 @@ const activityColors: Record<string, string> = {
   Theater: '#FF4136',
   Hiking: '#1E8449',
   Dog: '#117A65',
+  Walking: '#8B4513',     // Braun für Walking
+  Concert: '#9B59B6',     // Lila für Concert
+  Exhibition: '#E67E22',  // Orange für Exhibition
+  Sports: '#3498DB',      // Blau für Sports
 };
 type Activity = {
   id: string;
@@ -29,7 +38,6 @@ type Activity = {
   time: string;
   type: string;
 };
-const tags = ['Swimming', 'Picnic', 'Cycling', 'Theater', 'Hiking', 'Dog'];
 const createIcon = (activity: Activity) => {
   const color = activityColors[activity.type] || '#555';
   const icon = activityIcons[activity.type] || '';
@@ -47,13 +55,12 @@ const createIcon = (activity: Activity) => {
         <span style="margin-left: 6px;">${activity.name}</span>
       </div>
     `,
-    iconSize: [null, null],
+    iconSize: [150, 30],
     iconAnchor: [0, 20],
     popupAnchor: [0, -20],
   });
 };
 const LOCAL_STORAGE_KEY = 'savedEvents';
-const fetcher = (url: string) => fetch(url).then(res => res.json());
 const MapPage = () => {
   const [search, setSearch] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -67,14 +74,79 @@ const MapPage = () => {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem('darkMode') === 'true'
   );
-  const { data: activitiesRaw, mutate } = useSWR<Activity[]>('http://localhost:3000/api/events', fetcher);
-  // Mappe participants auf people
-  const activities = Array.isArray(activitiesRaw)
-    ? activitiesRaw.map((e: any) => ({
-        ...e,
-        people: e.participants,
+
+  // Use the new hook for filtered events
+  const { events: backendEvents, userInterests, refreshInterests } = useFilteredEvents();
+
+  // Debug: Log Backend Events
+  useEffect(() => {
+    console.log('🗺️ Map: Backend events received:', backendEvents);
+    console.log('🗺️ Map: Backend events count:', Array.isArray(backendEvents) ? backendEvents.length : 0);
+  }, [backendEvents]);
+
+  // Convert Backend-Events to Frontend-Format
+  const activities = Array.isArray(backendEvents)
+    ? backendEvents.map((e: any) => ({
+        id: e.id?.toString() || Math.random().toString(),
+        name: e.title || e.name,          // Backend verwendet 'title', Frontend erwartet 'name'
+        type: e.type || 'Walking',        // Event type for icon mapping
+        people: e.participants || 0,     // Number of participants
+        time: e.time || '00:00',         // Event time
+        position: e.position || [50.9866, 12.9716] as [number, number], // GPS-Position (Fallback: Mittweida)
       }))
     : [];
+
+  // Debug: Log converted activities
+  useEffect(() => {
+    console.log('🗺️ Map: Converted activities:', activities);
+    console.log('🗺️ Map: Activities count:', activities.length);
+  }, [activities]);
+
+  // Create tags based on selected interests from backend
+  const availableTags = React.useMemo(() => {
+    console.log('🔄 Map: User interests from backend:', userInterests);
+    
+    // Wenn keine Interessen ausgewählt sind, zeige alle verfügbaren Activity-Typen
+    if (!userInterests || userInterests.length === 0) {
+      console.log('📝 Map: No interests selected, showing all activity types');
+      const uniqueTypes = [...new Set(activities.map(a => a.type))];
+      console.log('🏷️ Map: All available activity types:', uniqueTypes);
+      return uniqueTypes;
+    }
+    
+    // Hole die Namen der ausgewählten Interessen direkt
+    const selectedInterestNames = userInterests
+      .map(id => interests.find(interest => interest.id === id))
+      .filter(interest => interest && interest.category !== null)
+      .map(interest => interest!.name);
+    
+    console.log('🏷️ Map: Generated tags from interests:', selectedInterestNames);
+    return selectedInterestNames;
+  }, [userInterests, activities]);
+  
+  // Erkenne Änderungen an den Interessen über localStorage
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'interestsChanged' && e.newValue === 'true') {
+        refreshInterests();
+        // Reset the flag
+        localStorage.removeItem('interestsChanged');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Prüfe initial, ob Interessen geändert wurden
+    if (localStorage.getItem('interestsChanged') === 'true') {
+      refreshInterests();
+      localStorage.removeItem('interestsChanged');
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [refreshInterests]);
+  
   // Load saved events from localStorage
   useEffect(() => {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -102,13 +174,27 @@ const MapPage = () => {
   useEffect(() => {
     localStorage.setItem('joinedEvents', JSON.stringify(joinedIds));
   }, [joinedIds]);
-  const filtered = activities.filter(
-    (a) =>
-      (search.trim() === '' ||
-        a.name.toLowerCase().includes(search.toLowerCase()) ||
-        a.type.toLowerCase().includes(search.toLowerCase())) &&
-      (!selectedTag || a.type === selectedTag)
-  );
+  const filtered = activities.filter((a) => {
+    // Suchfilter
+    const matchesSearch = search.trim() === '' ||
+      a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.type.toLowerCase().includes(search.toLowerCase());
+
+    // Interest-Filter: Wenn ein Tag ausgewählt ist, filtere nach der entsprechenden Kategorie
+    let matchesInterest = true;
+    if (selectedTag) {
+      // Finde das Interest-Objekt für den ausgewählten Tag
+      const selectedInterest = interests.find(interest => interest.name === selectedTag);
+      if (selectedInterest && selectedInterest.category) {
+        // Filtere Events nach der Backend-Kategorie
+        matchesInterest = a.type === selectedInterest.category;
+      } else {
+        matchesInterest = false;
+      }
+    }
+
+    return matchesSearch && matchesInterest;
+  });
   const isSaved = (id: string) => saved.some((e) => e.id === id);
   const handleSave = (activity: Activity) => {
     if (!isSaved(activity.id)) {
@@ -122,9 +208,9 @@ const MapPage = () => {
   const hasJoined = (id: string) => joinedIds.includes(id);
   const handleJoin = async (id: string) => {
     if (hasJoined(id)) return;
-    await fetch(`http://localhost:3000/api/events/${id}/join`, { method: 'POST' });
+    await fetch(`/api/events/${id}/join`, { method: 'POST' });
     setJoinedIds((prev) => [...prev, id]);
-    mutate();
+    // TODO: Reload events after joining
   };
   // Klick außerhalb schließt das Menü
   useEffect(() => {
@@ -194,7 +280,7 @@ const MapPage = () => {
           </div>
         </div>
         <div className="tags-container">
-          {tags.map((tag) => (
+          {availableTags.map((tag) => (
             <button
               key={tag}
               onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
@@ -203,6 +289,11 @@ const MapPage = () => {
               {tag}
             </button>
           ))}
+          {availableTags.length === 0 && (
+            <div className="no-interests-message">
+              Keine Interessen ausgewählt - besuchen Sie die Interessen-Seite
+            </div>
+          )}
         </div>
       </nav>
       <nav className={`bottom-nav ${darkMode ? 'darkmode' : ''}`}>

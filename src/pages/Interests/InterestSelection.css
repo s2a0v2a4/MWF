@@ -1,6 +1,9 @@
+/* Import Mittweida Theme */
+@import '/src/styles/mittweida-theme.css';
+
 .interest-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--mittweida-gold) 0%, var(--mittweida-gold-dark) 50%, var(--mittweida-black) 100%);
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -8,41 +11,56 @@
 .container {
   max-width: 600px;
   margin: 0 auto;
-  background: white;
-  border-radius: 20px;
+  background: var(--neutral-white);
+  border-radius: var(--radius-xl);
   padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-heavy);
+  border: 3px solid var(--mittweida-black);
 }
 
 .interest-page h1 {
   text-align: center;
-  color: #333;
+  color: var(--mittweida-black);
   margin-bottom: 10px;
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
 }
 
 .subtitle {
   text-align: center;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 30px;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .error-message {
-  background: #fee;
-  color: #c33;
-  padding: 12px 16px;
-  border-radius: 8px;
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--accent-error);
+  padding: 16px 20px;
+  border-radius: var(--radius-medium);
   margin-bottom: 20px;
-  border: 1px solid #fcc;
+  border: 2px solid var(--accent-error);
   text-align: center;
+  font-weight: 600;
+}
+
+.validation-message {
+  background: rgba(255, 193, 7, 0.1);
+  color: #856404;
+  padding: 16px 20px;
+  border-radius: var(--radius-medium);
+  margin-bottom: 20px;
+  border: 2px solid #ffc107;
+  text-align: center;
+  font-weight: 600;
 }
 
 .interests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
   margin-bottom: 40px;
 }
 
@@ -50,78 +68,110 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 12px;
-  border: 2px solid #e1e5e9;
-  border-radius: 12px;
-  background: white;
+  padding: 24px 16px;
+  border: 3px solid var(--mittweida-black);
+  border-radius: var(--radius-large);
+  background: var(--neutral-white);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 100px;
+  transition: var(--transition-medium);
+  min-height: 120px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-light);
 }
 
 .interest-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-heavy);
+  border-color: var(--mittweida-gold);
+  background: var(--mittweida-gold-pale);
 }
 
 .interest-card.selected {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  border-color: var(--mittweida-gold);
+  background: linear-gradient(135deg, var(--mittweida-gold), var(--mittweida-gold-light));
+  color: var(--mittweida-black);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-heavy);
+  font-weight: 700;
+}
+
+.interest-card.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--mittweida-black);
+  color: var(--mittweida-gold);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .interest-card:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .interest-icon {
-  font-size: 2rem;
-  margin-bottom: 8px;
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  filter: drop-shadow(2px 2px 4px rgba(26, 26, 26, 0.2));
 }
 
 .interest-name {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-align: center;
+  line-height: 1.2;
 }
 
 .action-section {
   text-align: center;
+  padding: 24px;
+  background: var(--mittweida-gold-pale);
+  border-radius: var(--radius-large);
+  border: 2px solid var(--mittweida-gold);
+  margin-top: 24px;
 }
 
 .selected-count {
-  color: #666;
+  color: var(--mittweida-black);
   margin-bottom: 20px;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .submit-button {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--mittweida-black), var(--mittweida-black-light));
+  color: var(--mittweida-gold);
+  border: 3px solid var(--mittweida-gold);
+  padding: 18px 36px;
+  border-radius: var(--radius-large);
+  font-size: 1.2rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-medium);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   margin: 0 auto;
-  min-width: 200px;
+  min-width: 220px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-medium);
 }
 
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
 }
 
 .submit-button:disabled {
@@ -134,14 +184,14 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
+  border-top: 2px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .success-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary-dark) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,31 +203,32 @@
   border-radius: 20px;
   padding: 60px 40px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-large);
   max-width: 400px;
 }
 
 .success-icon {
   font-size: 4rem;
   margin-bottom: 20px;
+  color: var(--color-primary);
 }
 
 .success-card h2 {
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
   font-size: 1.5rem;
 }
 
 .success-card p {
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 30px;
 }
 
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;

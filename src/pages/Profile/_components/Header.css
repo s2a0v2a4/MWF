@@ -1,25 +1,33 @@
+@import '/src/styles/mittweida-theme.css';
+
 .header-bar {
   width: 100%;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #3e8e41;
-  color: white;
-  padding: 20px 40px; 
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-secondary);
+  padding: 20px 40px;
+  box-shadow: var(--shadow-medium);
 }
 
 .header-title {
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 600;
+  color: var(--color-secondary);
 }
 
 .icon {
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 8px; 
+  padding: 8px;
+  color: var(--color-secondary);
+  transition: var(--transition-base);
+  border-radius: 8px;
 }
 
 .icon:hover {
-  opacity: 0.8;
+  background: rgba(255, 215, 0, 0.1);
+  transform: scale(1.1);
 }

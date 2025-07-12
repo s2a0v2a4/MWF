@@ -1,5 +1,85 @@
-.fancy-button {
-  padding: 1rem;
-  border: solid 1rem lightgreen;
-  background-color: white;
+/* Import Mittweida Design System */
+@import '/src/styles/mittweida-theme.css';
+
+/* Global Reset und Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--neutral-light);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Global Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--mittweida-gold), var(--mittweida-gold-dark));
+  color: var(--text-on-gold);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-medium);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-medium);
+  box-shadow: var(--shadow-light);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-secondary {
+  background: var(--neutral-white);
+  color: var(--text-primary);
+  border: 2px solid var(--mittweida-gold);
+  padding: 10px 22px;
+  border-radius: var(--radius-medium);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-medium);
+}
+
+.btn-secondary:hover {
+  background: var(--mittweida-gold-pale);
+}
+
+/* Global Form Styles */
+.input-field {
+  padding: 12px 16px;
+  border: 2px solid var(--neutral-medium);
+  border-radius: var(--radius-medium);
+  font-size: 16px;
+  transition: var(--transition-fast);
+  background: var(--neutral-white);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--mittweida-gold);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.bg-gold { background-color: var(--mittweida-gold); }
+.bg-black { background-color: var(--mittweida-black); }
+.shadow-light { box-shadow: var(--shadow-light); }
+.shadow-medium { box-shadow: var(--shadow-medium); }
+.shadow-heavy { box-shadow: var(--shadow-heavy); }
