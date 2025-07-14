@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEvents, type BackendEvent } from '../../config/api';
 import { interests } from '../../data/interests';
+import { useUserInterests } from '../../hooks/useInterests';
 const activityIcons: Record<string, string> = {
   Swimming: '/icons/outline/swimming.svg',
   Picnic: '/icons/outline/picnic.svg',
@@ -72,6 +73,15 @@ const MapPage = () => {
   const markerRefs = useRef<(L.Marker | null)[]>([]);
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  
+  // ✅ User Interests Hook hinzufügen
+  const { interests: userInterests, loading: interestsLoading, refreshInterests } = useUserInterests();
+
+  // ✅ Debug: User interests changes
+  useEffect(() => {
+    console.log('🔍 Map: User interests changed:', userInterests);
+    console.log('🔍 Map: Interests loading:', interestsLoading);
+  }, [userInterests, interestsLoading]);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem('darkMode') === 'true'
@@ -110,8 +120,9 @@ const MapPage = () => {
 
     // Auto-refresh when window gets focus (e.g., returning from event creation)
     const handleFocus = () => {
-      console.log('🔄 Map: Window focused, refreshing events...');
+      console.log('🔄 Map: Window focused, refreshing events and interests...');
       loadEventsFromBackend();
+      refreshInterests(); // ✅ Auch Interessen neu laden
     };
 
     // Listen for custom event when new events are created
@@ -119,6 +130,18 @@ const MapPage = () => {
       console.log('🔄 Map: New event created, refreshing...');
       loadEventsFromBackend();
     };
+    
+    // ✅ Check for interests changes
+    const checkInterestsChanged = () => {
+      const interestsChanged = localStorage.getItem('interestsChanged');
+      if (interestsChanged === 'true') {
+        console.log('🔄 Map: Interests changed detected, refreshing...');
+        refreshInterests();
+        localStorage.removeItem('interestsChanged');
+      }
+    };
+    
+    checkInterestsChanged(); // Beim Laden prüfen
     
     window.addEventListener('focus', handleFocus);
     window.addEventListener('eventCreated', handleEventCreated);
@@ -160,15 +183,28 @@ const MapPage = () => {
     console.log('🗺️ Map: Activities count:', activities.length);
   }, [activities]);
 
-  // Create tags based on activity types
+  // ✅ Tags basierend auf User-Interessen generieren
   const availableTags = React.useMemo(() => {
-    console.log('🔄 Map: Creating tags from activities');
+    console.log('🔄 Map: Creating tags from user interests');
+    console.log('📝 Map: User interests from backend:', userInterests);
     
-    // Hole alle verfügbaren Activity-Typen aus den Events
-    const uniqueTypes = [...new Set(activities.map(a => a.type))];
-    console.log('🏷️ Map: Available activity types:', uniqueTypes);
-    return uniqueTypes;
-  }, [activities]);
+    if (!userInterests || userInterests.length === 0) {
+      console.log('⚠️ Map: No user interests found - showing all activity types');
+      // Fallback: Wenn keine Interessen ausgewählt, zeige alle verfügbaren Event-Types
+      const uniqueTypes = [...new Set(activities.map(a => a.type))];
+      console.log('🏷️ Map: Fallback tags from activities:', uniqueTypes);
+      return uniqueTypes;
+    }
+    
+    // Erstelle Tags aus User-Interessen
+    const userInterestNames = userInterests.map(id => {
+      const interest = interests.find(i => i.id === id);
+      return interest ? interest.name : null;
+    }).filter((name): name is string => name !== null);
+    
+    console.log('🏷️ Map: Generated tags from interests:', userInterestNames);
+    return userInterestNames;
+  }, [activities, userInterests]);
   
   // Load saved events from localStorage
   useEffect(() => {
@@ -344,12 +380,22 @@ const MapPage = () => {
               {tag}
             </button>
           ))}
-          {availableTags.length === 0 && !isLoadingEvents && (
+          {interestsLoading && (
             <div className="no-interests-message">
-              {activities.length === 0 
-                ? "Keine Events vom Backend geladen" 
-                : "Alle Event-Typen werden angezeigt"
+              ⏳ Loading interests...
+            </div>
+          )}
+          {!interestsLoading && availableTags.length === 0 && !isLoadingEvents && (
+            <div className="no-interests-message">
+              {userInterests.length === 0 
+                ? "❓ No interests selected. Go to /interests to select your interests."
+                : "📍 No tags available from your selected interests"
               }
+            </div>
+          )}
+          {!interestsLoading && userInterests.length > 0 && availableTags.length > 0 && (
+            <div className="interests-info">
+              🎯 Showing {availableTags.length} tags from {userInterests.length} selected interests
             </div>
           )}
         </div>
