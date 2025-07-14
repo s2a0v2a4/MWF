@@ -22,11 +22,11 @@ const EventsPage = () => {
     type: 'Walking',
     participants: 1,
     time: '',
-    date: '',  // ✅ Neu: Datum im Format YYYY-MM-DD
+    date: '',  // ✅ New: Date in format YYYY-MM-DD
     position: null as [number, number] | null
   });
 
-  // Zeit-Eingabe State (HH:mm in separaten Feldern)
+  // Time input state (HH:mm in separate fields)
   const [timeParts, setTimeParts] = useState(['', '', '', '']); // H1, H2, m1, m2
   const [timeFocusedIndex, setTimeFocusedIndex] = useState(0);
 
@@ -37,7 +37,7 @@ const EventsPage = () => {
     useRef<HTMLInputElement>(null),
   ];
 
-  // Übernehme selectedPosition aus Location-State
+  // Take selectedPosition from Location-State
   useEffect(() => {
     const state = location.state as { selectedPosition?: [number, number] } | null;
     if (state?.selectedPosition) {
@@ -45,7 +45,7 @@ const EventsPage = () => {
         ...f,
         position: state.selectedPosition!,
       }));
-      // State zurücksetzen
+      // Reset state
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location, navigate]);
@@ -67,14 +67,14 @@ const EventsPage = () => {
         position: [50.9866, 12.971] as [number, number], // Dummy position, as backend doesn't store geo data yet
         participants: event.participants || 0,
         time: event.time,
-        date: event.date || new Date().toISOString().split('T')[0], // ✅ Datum übernehmen oder heutiges Datum als Fallback
+        date: event.date || new Date().toISOString().split('T')[0], // ✅ Take date or today's date as fallback
         type: event.type || 'Walking'
       }));
       
       console.log('🔄 Converted events:', convertedEvents);
       console.log('🔄 Number of converted events:', convertedEvents.length);
       
-      // Zeige nur Backend-Events an
+      // Show only Backend-Events
       setEvents(convertedEvents);
       
     } catch (error) {
@@ -85,7 +85,7 @@ const EventsPage = () => {
     }
   };
   
-  // Lade Events beim ersten Laden der Komponente
+  // Load Events on first component load
   useEffect(() => {
     loadEventsFromBackend();
   }, []);
@@ -108,7 +108,7 @@ const EventsPage = () => {
     }
   };
 
-  // Synchronisiere zusammengesetzte Zeit mit form.time
+  // Synchronize composed time with form.time
   useEffect(() => {
     if (timeParts.every(ch => ch.match(/^\d$/))) {
       setForm(f => ({ 
@@ -166,7 +166,7 @@ const EventsPage = () => {
       return;
     }
     
-    // Überprüfe, dass das Datum nicht in der Vergangenheit liegt
+    // Check that the date is not in the past
     const selectedDate = new Date(form.date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -181,7 +181,7 @@ const EventsPage = () => {
       console.log('🔍 Form participants value:', form.participants, 'Type:', typeof form.participants);
       console.log('🔍 Full form object:', JSON.stringify(form, null, 2));
       
-      // Event an Backend senden
+      // Send event to backend
       const newEvent = await createEvent(form as FrontendEvent);
       
       console.log('✅ Event successfully created:', newEvent);
@@ -196,13 +196,13 @@ const EventsPage = () => {
         type: 'Walking',
         participants: 1,
         time: '',
-        date: '',  // ✅ Datum auch zurücksetzen
+        date: '',  // ✅ Also reset date
         position: null
       });
       setTimeParts(['', '', '', '']);
       setTimeFocusedIndex(0);
       
-      // ✅ Zurück zur Map-Seite nach erfolgreichem Event erstellen
+      // ✅ Back to Map page after successful event creation
       console.log('🗺️ Navigating back to map...');
       navigate('/map');
       
@@ -247,33 +247,33 @@ const EventsPage = () => {
             type="text"
             value={form.name}
             onChange={(e) => setForm({...form, name: e.target.value})}
-            placeholder="z.B. Sommerfest im Park"
+            placeholder="e.g. Summer festival in the park"
             className="events-input"
             required
           />
         </div>
 
-        {/* 3. Aktivität */}
+        {/* 3. Activity */}
         <div className="form-group">
-          <label>Aktivität:</label>
+          <label>Activity:</label>
           <select 
-            title="Wähle eine Aktivität"
+            title="Choose an activity"
             value={form.type}
             onChange={(e) => setForm({...form, type: e.target.value})}
             className="events-input"
           >
-            <option value="Walking">🚶 Spazieren</option>
-            <option value="Picnic">🧺 Picknick</option>
-            <option value="Cycling">🚴 Radfahren</option>
-            <option value="Swimming">🏊 Schwimmen</option>
+            <option value="Walking">🚶 Walking</option>
+            <option value="Picnic">🧺 Picnic</option>
+            <option value="Cycling">🚴 Cycling</option>
+            <option value="Swimming">🏊 Swimming</option>
             <option value="Theater">🎭 Theater</option>
-            <option value="Hiking">🥾 Wandern</option>
+            <option value="Hiking">🥾 Hiking</option>
           </select>
         </div>
 
         {/* 4. Number of participants */}
         <div className="form-group">
-          <label>Wie viele Leute kommen mit?</label>
+          <label>How many people are joining?</label>
           <div className="participants-selector">
             <button
               type="button"
@@ -283,7 +283,7 @@ const EventsPage = () => {
               ➖
             </button>
             <span className="participants-display">
-              👥 {form.participants} {form.participants === 1 ? 'Person' : 'Personen'}
+              👥 {form.participants} {form.participants === 1 ? 'Person' : 'People'}
             </span>
             <button
               type="button"
@@ -295,7 +295,7 @@ const EventsPage = () => {
           </div>
         </div>
 
-        {/* 5. Uhrzeit */}
+        {/* 5. Time */}
         <div className="form-group">
           <label className="required-label">Time (Required):</label>
           <div className="time-input-wrapper">
@@ -310,7 +310,7 @@ const EventsPage = () => {
                   onFocus={() => handleTimeFocus(i)}
                   ref={inputsRefs[i]}
                   className={`time-input ${timeFocusedIndex === i ? 'focused' : ''}`}
-                  title={`Zeit Eingabe Teil ${i + 1}`}
+                  title={`Time input part ${i + 1}`}
                 />
                 {(i === 1) && <span className="time-separator">:</span>}
               </React.Fragment>
@@ -319,7 +319,7 @@ const EventsPage = () => {
           <small className="time-hint">Format: HH:mm (e.g. 14:30)</small>
         </div>
 
-        {/* 6. Datum */}
+        {/* 6. Date */}
         <div className="form-group">
           <label className="required-label">Date (Required):</label>
           <input
@@ -328,7 +328,7 @@ const EventsPage = () => {
             onChange={(e) => setForm({...form, date: e.target.value})}
             className="events-input"
             min={new Date().toISOString().split('T')[0]}
-            title="Wähle das Event-Datum"
+            title="Choose the event date"
             required
           />
           <small className="date-hint">Format: YYYY-MM-DD (minimum: today)</small>
@@ -342,7 +342,7 @@ const EventsPage = () => {
         </button>
       </form>
 
-      {/* Event-Liste */}
+      {/* Event List */}
       <div className="events-list-section">
         <h2>Current Events {isLoadingEvents && '(Loading...)'}</h2>
         <div className="events-list">
