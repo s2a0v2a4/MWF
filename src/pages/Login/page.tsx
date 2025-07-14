@@ -164,10 +164,6 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-
-      <div className="demo-notice">
-        <p>🎭 Demo Mode: Enter any credentials</p>
-      </div>
     </div>
   );
 };
