@@ -325,7 +325,7 @@ const MapPage = () => {
           </button>
           <input
             type="text"
-            placeholder="Suche..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={`search-input ${darkMode ? 'darkmode' : ''}`}
@@ -366,7 +366,7 @@ const MapPage = () => {
             fontSize: '14px',
             color: '#666'
           }}>
-            <span>📍 Events geladen: {activities.length}</span>
+            <span>📍 Events loaded: {activities.length}</span>
             {isLoadingEvents && <span>⏳ Loading...</span>}
             {eventLoadError && <span style={{ color: '#dc3545' }}>❌ {eventLoadError}</span>}
           </div>
