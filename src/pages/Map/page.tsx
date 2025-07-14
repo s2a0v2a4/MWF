@@ -302,9 +302,10 @@ const MapPage = () => {
       <nav className={`top-nav ${darkMode ? 'darkmode' : ''}`}>
         <div className="nav-content">
           <span className={`nav-title ${darkMode ? 'darkmode' : ''}`}>
-            Mittweida Events Map ({activities.length} Events)
+            {/* Mittweida ({activities.length} Events) */}
+            Mittweida Events
           </span>
-          <button
+          {/* <button
             onClick={loadEventsFromBackend}
             className="refresh-button"
             style={{
@@ -321,7 +322,7 @@ const MapPage = () => {
             disabled={isLoadingEvents}
           >
             {isLoadingEvents ? '⏳ Loading...' : '🔄 Refresh'}
-          </button>
+          </button> */}
           <input
             type="text"
             placeholder="Search..."
@@ -365,7 +366,7 @@ const MapPage = () => {
             fontSize: '14px',
             color: '#666'
           }}>
-            <span>📍 Events loaded: {activities.length}</span>
+            {/* <span>📍 Events loaded: {activities.length}</span> */}
             {isLoadingEvents && <span>⏳ Loading...</span>}
             {eventLoadError && <span style={{ color: '#dc3545' }}>❌ {eventLoadError}</span>}
           </div>
