@@ -202,6 +202,10 @@ const EventsPage = () => {
       setTimeParts(['', '', '', '']);
       setTimeFocusedIndex(0);
       
+      // ✅ Zurück zur Map-Seite nach erfolgreichem Event erstellen
+      console.log('🗺️ Navigating back to map...');
+      navigate('/map');
+      
     } catch (error) {
       console.error('❌ Error creating event:', error);
       alert(`❌ Error creating event:\n${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -213,24 +217,6 @@ const EventsPage = () => {
       <div className="events-header">
         <h1>Events in Mittweida</h1>
         <p>Create new events or join existing events</p>
-        
-        <div style={{marginTop: '15px'}}>
-          <button 
-            type="button"
-            onClick={() => navigate('/admin')}
-            style={{
-              background: '#dc3545',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '0.9rem',
-              cursor: 'pointer'
-            }}
-          >
-            🛠️ Admin Panel
-          </button>
-        </div>
       </div>
 
       {/* Event form with all required fields */}

@@ -242,14 +242,13 @@ const MapPage = () => {
     // Interest-Filter: Wenn ein Tag ausgewählt ist, filtere nach der entsprechenden Kategorie
     let matchesInterest = true;
     if (selectedTag) {
-      // Finde das Interest-Objekt für den ausgewählten Tag
-      const selectedInterest = interests.find(interest => interest.name === selectedTag);
-      if (selectedInterest && selectedInterest.category) {
-        // Filtere Events nach der Backend-Kategorie
-        matchesInterest = a.type === selectedInterest.category;
-      } else {
-        matchesInterest = false;
-      }
+      console.log('🔍 Filter: Selected tag:', selectedTag);
+      console.log('🔍 Filter: Checking event:', a.name, 'type:', a.type, 'category:', a.category);
+      
+      // 🎯 NEUE LOGIK: Nur direkter Match zwischen Interest-Name und Event-Type
+      // "Cycling" Tag soll nur "Cycling" Events zeigen, nicht alle "Sport" Events
+      matchesInterest = a.type === selectedTag;
+      console.log('🔍 Filter: Direct type match:', a.type, '===', selectedTag, '→', matchesInterest);
     }
 
     return matchesSearch && matchesInterest;
