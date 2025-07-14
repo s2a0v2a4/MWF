@@ -51,15 +51,15 @@ const LoginPage = () => {
               <div className="flag-stripe yellow"></div>
             </div>
           </div>
-          <h1 className="welcome-title">Willkommen zur</h1>
+          <h1 className="welcome-title">Welcome to</h1>
           <h2 className="app-title">Mittweida Events</h2>
-          <p className="subtitle">Entdecke Events in deiner Nähe</p>
+          <p className="subtitle">Discover events in your area</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
             <label htmlFor="username" className="input-label">
-              Benutzername oder E-Mail
+              Username or Email
             </label>
             <div className="input-wrapper">
               <FaUser className="input-icon" />
@@ -70,7 +70,7 @@ const LoginPage = () => {
                 value={formData.username}
                 onChange={handleInputChange}
                 className="login-input"
-                placeholder="Dein Benutzername"
+                placeholder="Your username"
                 required
               />
             </div>
@@ -78,7 +78,7 @@ const LoginPage = () => {
 
           <div className="input-group">
             <label htmlFor="password" className="input-label">
-              Passwort
+              Password
             </label>
             <div className="input-wrapper">
               <FaLock className="input-icon" />
@@ -89,14 +89,14 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 className="login-input"
-                placeholder="Dein Passwort"
+                placeholder="Your password"
                 required
               />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={togglePasswordVisibility}
-                aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -106,10 +106,10 @@ const LoginPage = () => {
           <div className="form-options">
             <label className="checkbox-container">
               <input type="checkbox" className="remember-checkbox" />
-              <span className="checkbox-text">Angemeldet bleiben</span>
+              <span className="checkbox-text">Stay logged in</span>
             </label>
             <button type="button" className="forgot-password">
-              Passwort vergessen?
+              Forgot password?
             </button>
           </div>
 
@@ -121,33 +121,33 @@ const LoginPage = () => {
             {isLoading ? (
               <>
                 <div className="spinner"></div>
-                Anmelden...
+                Signing in...
               </>
             ) : (
-              'Anmelden'
+              'Sign In'
             )}
           </button>
         </form>
 
         <div className="login-footer">
           <p className="signup-text">
-            Noch kein Konto? 
+            Don't have an account? 
             <button 
               type="button" 
               className="signup-link"
-              onClick={() => alert('Registrierung kommt bald! 🚀')}
+              onClick={() => alert('Registration coming soon! 🚀')}
             >
-              Jetzt registrieren
+              Sign up now
             </button>
           </p>
           
           <div className="social-login">
-            <p className="social-text">Oder anmelden mit:</p>
+            <p className="social-text">Or sign in with:</p>
             <div className="social-buttons">
               <button 
                 type="button" 
                 className="social-button google"
-                onClick={() => alert('Google Login kommt bald! 📧')}
+                onClick={() => alert('Google Login coming soon! 📧')}
               >
                 <span className="social-icon">🔗</span>
                 Google
@@ -155,7 +155,7 @@ const LoginPage = () => {
               <button 
                 type="button" 
                 className="social-button facebook"
-                onClick={() => alert('Facebook Login kommt bald! 👥')}
+                onClick={() => alert('Facebook Login coming soon! 👥')}
               >
                 <span className="social-icon">📘</span>
                 Facebook
@@ -166,7 +166,7 @@ const LoginPage = () => {
       </div>
 
       <div className="demo-notice">
-        <p>🎭 Demo-Modus: Beliebige Anmeldedaten eingeben</p>
+        <p>🎭 Demo Mode: Enter any credentials</p>
       </div>
     </div>
   );

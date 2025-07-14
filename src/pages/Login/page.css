@@ -1,11 +1,13 @@
-/* Login Page Styles */
+/* Login Page Styles - Mittweida Theme */
+@import '/src/styles/mittweida-theme.css';
+
 .login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--mittweida-black) 0%, var(--mittweida-black-light) 100%);
   padding: 20px;
   box-sizing: border-box;
 }
@@ -26,8 +28,8 @@
   right: 0;
   bottom: 0;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
-    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.1) 2px, transparent 2px);
   background-size: 50px 50px;
   animation: float 20s ease-in-out infinite;
 }
@@ -40,12 +42,13 @@
 .login-card {
   background: white;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   padding: 40px;
   width: 100%;
   max-width: 420px;
   position: relative;
   z-index: 1;
+  border: 3px solid var(--mittweida-gold);
 }
 
 .login-header {
@@ -88,22 +91,23 @@
 .welcome-title {
   font-size: 1.8rem;
   font-weight: 300;
-  color: #666;
+  color: var(--mittweida-black-light);
   margin: 0 0 5px 0;
 }
 
 .app-title {
   font-size: 2.2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--mittweida-gold), var(--mittweida-gold-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
-  color: #888;
+  color: var(--mittweida-black-light);
   font-size: 1rem;
   margin: 0;
 }
@@ -120,7 +124,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #333;
+  color: var(--mittweida-black);
   font-size: 0.9rem;
 }
 
@@ -133,7 +137,7 @@
 .input-icon {
   position: absolute;
   left: 15px;
-  color: #888;
+  color: var(--mittweida-black-light);
   font-size: 1rem;
   z-index: 1;
 }
@@ -141,7 +145,7 @@
 .login-input {
   width: 100%;
   padding: 15px 15px 15px 45px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--mittweida-gold-pale);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -151,9 +155,9 @@
 
 .login-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--mittweida-gold);
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
 }
 
 .password-toggle {
@@ -161,7 +165,7 @@
   right: 15px;
   background: none;
   border: none;
-  color: #888;
+  color: var(--mittweida-black-light);
   cursor: pointer;
   padding: 5px;
   border-radius: 4px;
@@ -169,7 +173,7 @@
 }
 
 .password-toggle:hover {
-  color: #555;
+  color: var(--mittweida-gold-dark);
 }
 
 .form-options {
@@ -195,28 +199,30 @@
 
 .checkbox-text {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--mittweida-black-light);
 }
 
 .forgot-password {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--mittweida-gold-dark);
   text-decoration: none;
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0;
+  font-weight: 500;
 }
 
 .forgot-password:hover {
   text-decoration: underline;
+  color: var(--mittweida-gold);
 }
 
 .login-button {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(135deg, var(--mittweida-gold), var(--mittweida-gold-dark));
+  color: var(--mittweida-black);
   border: none;
   border-radius: 12px;
   font-size: 1.1rem;
@@ -227,11 +233,13 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+  background: linear-gradient(135deg, var(--mittweida-gold-light), var(--mittweida-gold));
 }
 
 .login-button:disabled {
@@ -243,7 +251,7 @@
   width: 20px;
   height: 20px;
   border: 2px solid transparent;
-  border-top: 2px solid white;
+  border-top: 2px solid var(--mittweida-black);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -258,7 +266,7 @@
 }
 
 .signup-text {
-  color: #666;
+  color: var(--mittweida-black-light);
   font-size: 0.9rem;
   margin-bottom: 20px;
 }
@@ -266,7 +274,7 @@
 .signup-link {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--mittweida-gold-dark);
   text-decoration: none;
   font-weight: 500;
   cursor: pointer;
@@ -275,15 +283,16 @@
 
 .signup-link:hover {
   text-decoration: underline;
+  color: var(--mittweida-gold);
 }
 
 .social-login {
-  border-top: 1px solid #eee;
+  border-top: 2px solid var(--mittweida-gold-pale);
   padding-top: 20px;
 }
 
 .social-text {
-  color: #888;
+  color: var(--mittweida-black-light);
   font-size: 0.9rem;
   margin-bottom: 15px;
 }
@@ -299,7 +308,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 15px;
-  border: 2px solid #eee;
+  border: 2px solid var(--mittweida-gold-pale);
   background: white;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -310,22 +319,9 @@
 }
 
 .social-button:hover {
-  border-color: #ddd;
-  background: #f9f9f9;
-}
-
-.social-button.google:hover {
-  border-color: #db4437;
-  background: #fdf2f2;
-}
-
-.social-button.facebook:hover {
-  border-color: #4267b2;
-  background: #f2f4f9;
-}
-
-.social-icon {
-  font-size: 1.1rem;
+  border-color: var(--mittweida-gold);
+  background: var(--mittweida-gold-pale);
+  transform: translateY(-1px);
 }
 
 .demo-notice {
@@ -333,12 +329,13 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
+  background: rgba(0, 0, 0, 0.9);
+  color: var(--mittweida-gold);
   padding: 10px 20px;
   border-radius: 25px;
   font-size: 0.9rem;
   z-index: 1000;
+  border: 1px solid var(--mittweida-gold);
 }
 
 .demo-notice p {

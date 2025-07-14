@@ -1,6 +1,9 @@
 /* Import Mittweida Theme */
 @import '/src/styles/mittweida-theme.css';
 
+/* Critical Leaflet CSS Override */
+@import 'leaflet/dist/leaflet.css';
+
 .map-container {
   height: 100vh;
   width: 100vw;
@@ -297,16 +300,43 @@
 
 .main-content {
   width: 100vw;
-  height: calc(100vh - 70px - 48px);
-  overflow-y: auto;
+  height: calc(100vh - 120px); /* Adjusted for header + nav */
+  overflow: hidden;
   max-width: 100vw;
   padding-top: 70px;
   padding-bottom: 56px;
+  position: relative;
 }
 
 .map-container-leaflet {
-  height: 100%;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 1;
+  position: relative;
+}
+
+/* Leaflet CSS fixes */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  background: #f0f8ff !important;
+}
+
+.leaflet-map-pane {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.leaflet-tile-container {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Fix für Leaflet loading issues */
+.leaflet-loading {
+  background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wjRLEuBW1RRtfNJ0rDpfmQDwZJVcZHFmQkdHJlYyZRu+FFgNE34x9iM4vCAAh+QQJCgAAACwAAAAAEAAQAAADMQi63P4WjkOJw1tR1x9hHMzFUCOYA5kZqqCrT8FUjX8hHdVFxOl3HuQRgGO5jK4AzIAAOw==');
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .saved-events-container {

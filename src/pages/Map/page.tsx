@@ -74,6 +74,34 @@ const MapPage = () => {
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
+  const mapRef = useRef<L.Map | null>(null);
+
+  // ✅ Fix für Map-Loading-Probleme
+  useEffect(() => {
+    // Force Leaflet to invalidate size after component mount
+    const timer = setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+        console.log('🗺️ Map size invalidated');
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [activeNav]);
+
+  // ✅ Window resize handler for map
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+        console.log('🗺️ Map resized');
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // ✅ User Interests Hook hinzufügen
   const { interests: userInterests, loading: interestsLoading, refreshInterests } = useUserInterests();
 
@@ -428,6 +456,15 @@ const MapPage = () => {
             className="map-container-leaflet"
             scrollWheelZoom={true}
             dragging={true}
+            ref={mapRef}
+            whenReady={() => {
+              console.log('🗺️ Map ready');
+              setTimeout(() => {
+                if (mapRef.current) {
+                  mapRef.current.invalidateSize();
+                }
+              }, 50);
+            }}
           >
             <TileLayer
               attribution="© OpenStreetMap"
