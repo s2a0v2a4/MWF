@@ -16,8 +16,7 @@ const NameInputPage: React.FC = () => {
         placeholder="Your name"
         className="border p-2 mb-4 block w-full max-w-xs"
       />
-      <br>
-      </br>
+      <br />
       <button
         onClick={handleClick}
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
