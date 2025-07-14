@@ -15,8 +15,8 @@ const NavBar = () => {
           position: 'fixed',
           bottom: '7rem',
           right: '1.5rem',
-          backgroundColor: '#FFD700',
-          color: '#1A1A1A',
+          backgroundColor: '#2e7d32',
+          color: 'white',
           width: 190,
           height: 50,
           borderRadius: '30px',
@@ -27,7 +27,7 @@ const NavBar = () => {
           alignItems: 'center',
           cursor: 'pointer',
           zIndex: 1200,
-          boxShadow: '0 4px 16px rgba(255, 215, 0, 0.3)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.13)',
         }}
         onClick={() => navigate('/selectlocation')}
       >
@@ -55,7 +55,7 @@ const NavBar = () => {
             style={{
               background: 'none',
               border: 'none',
-              color: location.pathname === item.path ? '#FFD700' : '#333',
+              color: location.pathname === item.path ? '#2e7d32' : '#333',
               fontWeight: location.pathname === item.path ? 700 : 500,
               fontSize: 18,
               display: 'flex',
@@ -63,7 +63,7 @@ const NavBar = () => {
               alignItems: 'center',
               cursor: 'pointer',
               padding: '4px 10px',
-              borderBottom: location.pathname === item.path ? '2.5px solid #FFD700' : '2.5px solid transparent',
+              borderBottom: location.pathname === item.path ? '2.5px solid #2e7d32' : '2.5px solid transparent',
               transition: 'all 0.2s',
               minWidth: 60,
             }}

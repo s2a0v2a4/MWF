@@ -59,7 +59,6 @@ export type FrontendEvent = {
   position: [number, number];
   participants: number;
   time: string;
-  date: string;                  // ✅ Neu: Datum im Format YYYY-MM-DD
   type: string;
   description?: string;          // ✅ Neu hinzugefügt
   category?: string;             // ✅ Neu hinzugefügt
@@ -72,7 +71,6 @@ export type BackendEvent = {
   description: string;
   category: string;
   time: string;
-  date: string;                  // ✅ Neu: Datum im Format YYYY-MM-DD
   type: string;
   participants: number;
   latitude: number;              // ✅ Echte GPS-Koordinaten vom Backend
@@ -85,7 +83,6 @@ export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEv
   description: frontendEvent.description || `${frontendEvent.type} Event in Mittweida`, // Use provided or generate description
   category: frontendEvent.category || typeToCategoryMap[frontendEvent.type] || 'Sport',
   time: frontendEvent.time,
-  date: frontendEvent.date,  // ✅ Datum direkt übernehmen
   type: frontendEvent.type,
   participants: frontendEvent.participants,  // ✅ Direkt verwenden ohne Fallback
   latitude: frontendEvent.position[0],   // GPS-Koordinaten aus position array

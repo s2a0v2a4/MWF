@@ -22,9 +22,8 @@ const Badges = () => (
     justifyContent: 'space-around', 
     // marginTop: '1.5rem', 
     width: '100%',
-    background: 'linear-gradient(135deg, #FFD700 0%, #F57F17 100%)',
-    padding: '1rem 0',
-    boxShadow: '0 2px 8px rgba(255, 215, 0, 0.2)'
+    backgroundColor: '#2E8546',
+    padding: '1rem 0'
   }}>
     {[FaStar, FaHeart, FaCalendar, FaUser].map((Icon, i) => (
       <div key={i} style={badgeStyle}><Icon /></div>

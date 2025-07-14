@@ -6,223 +6,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, var(--mittweida-black) 0%, var(--mittweida-black-light) 100%);
-  color: var(--mittweida-gold);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-secondary);
   padding: 20px 40px;
   box-shadow: var(--shadow-medium);
-  position: relative;
-  z-index: 100;
-  border-bottom: 3px solid var(--mittweida-gold);
 }
 
 .header-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--mittweida-gold);
-  text-shadow: none;
+  color: var(--color-secondary);
 }
 
 .icon {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 8px;
-  color: var(--mittweida-gold);
+  color: var(--color-secondary);
   transition: var(--transition-base);
   border-radius: 8px;
 }
 
 .icon:hover {
-  background: rgba(255, 215, 0, 0.15);
+  background: rgba(255, 215, 0, 0.1);
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-}
-
-.menu-container {
-  position: relative;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 10px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  min-width: 280px;
-  z-index: 1000;
-  overflow: hidden;
-  border: 2px solid var(--mittweida-gold);
-}
-
-.menu-header {
-  padding: 16px 20px;
-  background: linear-gradient(135deg, var(--mittweida-black) 0%, var(--mittweida-black-light) 100%);
-  color: var(--mittweida-gold);
-  text-align: center;
-  border-bottom: 2px solid var(--mittweida-gold);
-}
-
-.menu-header h3 {
-  margin: 0 0 4px 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--mittweida-gold);
-}
-
-.menu-header p {
-  margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
-  color: var(--mittweida-gold-light);
-}
-
-.menu-items {
-  padding: 8px 0;
-}
-
-.menu-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  gap: 12px;
-}
-
-.menu-item:hover {
-  background: var(--mittweida-gold-pale);
-  transform: translateX(2px);
-  border-left: 4px solid var(--mittweida-gold);
-}
-
-.menu-item-icon {
-  font-size: 1.2rem;
-  width: 24px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.menu-item-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.menu-item-label {
-  font-weight: 600;
-  color: var(--mittweida-black);
-  font-size: 0.95rem;
-  margin-bottom: 2px;
-}
-
-.menu-item-description {
-  font-size: 0.8rem;
-  color: var(--mittweida-black-light);
-  line-height: 1.2;
-}
-
-.menu-footer {
-  padding: 12px 20px;
-  background: var(--mittweida-gold-pale);
-  text-align: center;
-  border-top: 2px solid var(--mittweida-gold);
-}
-
-.menu-footer small {
-  color: var(--mittweida-black);
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .dropdown-menu {
-    background: var(--mittweida-black-light);
-    border-color: var(--mittweida-gold);
-  }
-  
-  .menu-item-label {
-    color: var(--mittweida-gold);
-  }
-  
-  .menu-item-description {
-    color: var(--mittweida-gold-light);
-  }
-  
-  .menu-item:hover {
-    background: rgba(255, 215, 0, 0.1);
-    border-left-color: var(--mittweida-gold);
-  }
-  
-  .menu-footer {
-    background: var(--mittweida-black);
-    border-top-color: var(--mittweida-gold);
-  }
-  
-  .menu-footer small {
-    color: var(--mittweida-gold);
-  }
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .header-bar {
-    padding: 15px 20px;
-  }
-  
-  .header-title {
-    font-size: 1.1rem;
-  }
-  
-  .dropdown-menu {
-    min-width: 260px;
-    right: -10px;
-  }
-  
-  .menu-item {
-    padding: 14px 16px;
-  }
-}
-
-/* Animation for menu appearance */
-.dropdown-menu {
-  animation: menuSlideIn 0.2s ease-out;
-}
-
-@keyframes menuSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Additional Mittweida styling enhancements */
-.menu-item:hover .menu-item-icon {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
-}
-
-.header-bar::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--mittweida-gold) 0%, var(--mittweida-gold-light) 50%, var(--mittweida-gold) 100%);
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
 }

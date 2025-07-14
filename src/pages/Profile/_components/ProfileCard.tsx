@@ -15,13 +15,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #FFD700 0%, #F57F17 100%)',
+      backgroundColor: '#388E3C',
       width: '100%',
       padding: '1.5rem',
       borderRadius: '1rem',
-      color: '#1A1A1A',
+      color: 'white',
       fontFamily: 'sans-serif',
-      boxShadow: '0 4px 16px rgba(255, 215, 0, 0.3)',
     }}>
       
       <div style={{
@@ -60,8 +59,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       }}>
         {[['Events joined', eventsJoined], ['Events created', eventsCreated], ['Profile likes', profileLikes]].map(([label, value], i) => (
           <div key={i}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1A1A1A' }}>{value}</div>
-            <div style={{ fontSize: '0.9rem', color: '#424242' }}>{label}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{value}</div>
+            <div style={{ fontSize: '0.9rem', color: '#eee' }}>{label}</div>
           </div>
         ))}
       </div>

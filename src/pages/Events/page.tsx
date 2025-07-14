@@ -22,11 +22,10 @@ const EventsPage = () => {
     type: 'Walking',
     participants: 1,
     time: '',
-    date: '',  // ✅ New: Date in format YYYY-MM-DD
     position: null as [number, number] | null
   });
 
-  // Time input state (HH:mm in separate fields)
+  // Zeit-Eingabe State (HH:mm in separaten Feldern)
   const [timeParts, setTimeParts] = useState(['', '', '', '']); // H1, H2, m1, m2
   const [timeFocusedIndex, setTimeFocusedIndex] = useState(0);
 
@@ -37,7 +36,7 @@ const EventsPage = () => {
     useRef<HTMLInputElement>(null),
   ];
 
-  // Take selectedPosition from Location-State
+  // Übernehme selectedPosition aus Location-State
   useEffect(() => {
     const state = location.state as { selectedPosition?: [number, number] } | null;
     if (state?.selectedPosition) {
@@ -45,7 +44,7 @@ const EventsPage = () => {
         ...f,
         position: state.selectedPosition!,
       }));
-      // Reset state
+      // State zurücksetzen
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location, navigate]);
@@ -67,14 +66,13 @@ const EventsPage = () => {
         position: [50.9866, 12.971] as [number, number], // Dummy position, as backend doesn't store geo data yet
         participants: event.participants || 0,
         time: event.time,
-        date: event.date || new Date().toISOString().split('T')[0], // ✅ Take date or today's date as fallback
         type: event.type || 'Walking'
       }));
       
       console.log('🔄 Converted events:', convertedEvents);
       console.log('🔄 Number of converted events:', convertedEvents.length);
       
-      // Show only Backend-Events
+      // Zeige nur Backend-Events an
       setEvents(convertedEvents);
       
     } catch (error) {
@@ -85,7 +83,7 @@ const EventsPage = () => {
     }
   };
   
-  // Load Events on first component load
+  // Lade Events beim ersten Laden der Komponente
   useEffect(() => {
     loadEventsFromBackend();
   }, []);
@@ -108,7 +106,7 @@ const EventsPage = () => {
     }
   };
 
-  // Synchronize composed time with form.time
+  // Synchronisiere zusammengesetzte Zeit mit form.time
   useEffect(() => {
     if (timeParts.every(ch => ch.match(/^\d$/))) {
       setForm(f => ({ 
@@ -161,27 +159,12 @@ const EventsPage = () => {
       return;
     }
     
-    if (!form.date) {
-      alert('⚠️ Please select a date for the event.');
-      return;
-    }
-    
-    // Check that the date is not in the past
-    const selectedDate = new Date(form.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (selectedDate < today) {
-      alert('⚠️ Please select a date that is today or in the future.');
-      return;
-    }
-    
     try {
       console.log('🚀 Creating event with data:', form);
       console.log('🔍 Form participants value:', form.participants, 'Type:', typeof form.participants);
       console.log('🔍 Full form object:', JSON.stringify(form, null, 2));
       
-      // Send event to backend
+      // Event an Backend senden
       const newEvent = await createEvent(form as FrontendEvent);
       
       console.log('✅ Event successfully created:', newEvent);
@@ -196,15 +179,10 @@ const EventsPage = () => {
         type: 'Walking',
         participants: 1,
         time: '',
-        date: '',  // ✅ Also reset date
         position: null
       });
       setTimeParts(['', '', '', '']);
       setTimeFocusedIndex(0);
-      
-      // ✅ Back to Map page after successful event creation
-      console.log('🗺️ Navigating back to map...');
-      navigate('/map');
       
     } catch (error) {
       console.error('❌ Error creating event:', error);
@@ -217,6 +195,24 @@ const EventsPage = () => {
       <div className="events-header">
         <h1>Events in Mittweida</h1>
         <p>Create new events or join existing events</p>
+        
+        <div style={{marginTop: '15px'}}>
+          <button 
+            type="button"
+            onClick={() => navigate('/admin')}
+            style={{
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '0.9rem',
+              cursor: 'pointer'
+            }}
+          >
+            🛠️ Admin Panel
+          </button>
+        </div>
       </div>
 
       {/* Event form with all required fields */}
@@ -247,33 +243,33 @@ const EventsPage = () => {
             type="text"
             value={form.name}
             onChange={(e) => setForm({...form, name: e.target.value})}
-            placeholder="e.g. Summer festival in the park"
+            placeholder="z.B. Sommerfest im Park"
             className="events-input"
             required
           />
         </div>
 
-        {/* 3. Activity */}
+        {/* 3. Aktivität */}
         <div className="form-group">
-          <label>Activity:</label>
+          <label>Aktivität:</label>
           <select 
-            title="Choose an activity"
+            title="Wähle eine Aktivität"
             value={form.type}
             onChange={(e) => setForm({...form, type: e.target.value})}
             className="events-input"
           >
-            <option value="Walking">🚶 Walking</option>
-            <option value="Picnic">🧺 Picnic</option>
-            <option value="Cycling">🚴 Cycling</option>
-            <option value="Swimming">🏊 Swimming</option>
+            <option value="Walking">🚶 Spazieren</option>
+            <option value="Picnic">🧺 Picknick</option>
+            <option value="Cycling">🚴 Radfahren</option>
+            <option value="Swimming">🏊 Schwimmen</option>
             <option value="Theater">🎭 Theater</option>
-            <option value="Hiking">🥾 Hiking</option>
+            <option value="Hiking">🥾 Wandern</option>
           </select>
         </div>
 
         {/* 4. Number of participants */}
         <div className="form-group">
-          <label>How many people are joining?</label>
+          <label>Wie viele Leute kommen mit?</label>
           <div className="participants-selector">
             <button
               type="button"
@@ -283,7 +279,7 @@ const EventsPage = () => {
               ➖
             </button>
             <span className="participants-display">
-              👥 {form.participants} {form.participants === 1 ? 'Person' : 'People'}
+              👥 {form.participants} {form.participants === 1 ? 'Person' : 'Personen'}
             </span>
             <button
               type="button"
@@ -295,7 +291,7 @@ const EventsPage = () => {
           </div>
         </div>
 
-        {/* 5. Time */}
+        {/* 5. Uhrzeit */}
         <div className="form-group">
           <label className="required-label">Time (Required):</label>
           <div className="time-input-wrapper">
@@ -310,28 +306,13 @@ const EventsPage = () => {
                   onFocus={() => handleTimeFocus(i)}
                   ref={inputsRefs[i]}
                   className={`time-input ${timeFocusedIndex === i ? 'focused' : ''}`}
-                  title={`Time input part ${i + 1}`}
+                  title={`Zeit Eingabe Teil ${i + 1}`}
                 />
                 {(i === 1) && <span className="time-separator">:</span>}
               </React.Fragment>
             ))}
           </div>
           <small className="time-hint">Format: HH:mm (e.g. 14:30)</small>
-        </div>
-
-        {/* 6. Date */}
-        <div className="form-group">
-          <label className="required-label">Date (Required):</label>
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({...form, date: e.target.value})}
-            className="events-input"
-            min={new Date().toISOString().split('T')[0]}
-            title="Choose the event date"
-            required
-          />
-          <small className="date-hint">Format: YYYY-MM-DD (minimum: today)</small>
         </div>
 
         <button 
@@ -342,7 +323,7 @@ const EventsPage = () => {
         </button>
       </form>
 
-      {/* Event List */}
+      {/* Event-Liste */}
       <div className="events-list-section">
         <h2>Current Events {isLoadingEvents && '(Loading...)'}</h2>
         <div className="events-list">
@@ -364,7 +345,7 @@ const EventsPage = () => {
               <div key={event.id} className="events-list-item">
                 <div className="event-info">
                   <h3>{event.name}</h3>
-                  <p>🏃 {event.type} • � {event.date} • �🕐 {event.time} • 👥 {event.participants} participants</p>
+                  <p>🏃 {event.type} • 🕐 {event.time} • 👥 {event.participants} participants</p>
                   <p>📍 Mittweida [{event.position[0].toFixed(3)}, {event.position[1].toFixed(3)}]</p>
                   <small className="event-id">Backend-ID: {event.id}</small>
                 </div>
