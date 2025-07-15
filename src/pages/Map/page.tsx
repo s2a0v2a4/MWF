@@ -174,41 +174,28 @@ const MapPage = () => {
   // Create tags based on activity types AND user's selected interests FROM BACKEND
   const availableTags = React.useMemo(() => {
     console.log('🔄 Map: Creating tags from activities and backend interests');
-    
-    // Get event types from backend
-    const eventTypes = [...new Set(activities.map(a => a.type))];
-    console.log('🏷️ Map: Event types from backend:', eventTypes);
-    
-    // Get user interests from BACKEND - CORRECTED DATA ACCESS
+
+    // User-Interest-Namen aus Backend
     let userInterestNames: string[] = [];
-    
     if (userInterestsFromBackend?.interests && Array.isArray(userInterestsFromBackend.interests)) {
-      console.log('🌐 User interests from backend:', userInterestsFromBackend.interests);
-      
-      // Map interest IDs from backend to names
       userInterestNames = userInterestsFromBackend.interests.map((interestId: number) => {
         const interest = interests.find(i => i.id === interestId);
-        if (!interest) {
-          console.warn(`⚠️ No match found in interests for backend ID: ${interestId}`);
-          return null;
-        }
-        console.log(`🔍 Mapping backend ID ${interestId} to:`, interest.name);
-        return interest.name;
+        return interest?.name ?? null;
       }).filter(Boolean) as string[];
-      
-      console.log('👤 Map: User selected interest names from backend:', userInterestNames);
-    } else if (interestsError) {
-      console.error('❌ Error loading user interests from backend:', interestsError);
-    } else {
-      console.log('⏳ Still loading user interests from backend...');
     }
-    
-    // Combine both lists and remove duplicates
-    const allTags = [...eventTypes, ...userInterestNames];
-    const uniqueTags = [...new Set(allTags)];
-    
-    console.log('🏷️ Map: Final available tags (from backend):', uniqueTags);
-    return uniqueTags;
+
+    // Event-Typen aus geladenen Events
+    const eventTypes = [...new Set(activities.map(a => a.type))];
+
+    // Wenn User-Interessen ausgewählt sind, zeige nur diese als Tags
+    if (userInterestNames.length > 0) {
+      console.log('👤 Only showing user interests as tags:', userInterestNames);
+      return userInterestNames;
+    }
+
+    // Wenn keine Interessen ausgewählt, zeige alle Event-Typen als Tags
+    console.log('🏷️ No interests selected, showing all event types:', eventTypes);
+    return eventTypes;
   }, [activities, userInterestsFromBackend, interestsError]);
 
   // Load saved events from localStorage
