@@ -254,7 +254,7 @@ const EventsPage = () => {
               </React.Fragment>
             ))}
           </div>
-          <small className="time-hint">Format: HH:mm (e.g. 14:30)</small>
+         
         </div>
         <button 
           type="submit"
