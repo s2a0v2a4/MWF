@@ -6,6 +6,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEvents, type BackendEvent } from '../../config/api';
 import { interests } from '../../data/interests';
+import useSWR from 'swr';
+
 const activityIcons: Record<string, string> = {
   Swimming: '/icons/outline/swimming.svg',
   Picnic: '/icons/outline/picnic.svg',
@@ -160,16 +162,55 @@ const MapPage = () => {
     console.log('🗺️ Map: Activities count:', activities.length);
   }, [activities]);
 
-  // Create tags based on activity types
+  // 🔄 Load User Interests from Backend via SWR - CORRECTED ROUTE
+  const { data: userInterestsFromBackend, error: interestsError } = useSWR(
+    '/api/interests', // ✅ Korrekte Route (nicht /api/user/interests)
+    async () => {
+      const response = await fetch('/api/interests'); // ✅ Keine Auth nötig
+      return response.json();
+    }
+  );
+
+  // Create tags based on activity types AND user's selected interests FROM BACKEND
   const availableTags = React.useMemo(() => {
-    console.log('🔄 Map: Creating tags from activities');
+    console.log('🔄 Map: Creating tags from activities and backend interests');
     
-    // Hole alle verfügbaren Activity-Typen aus den Events
-    const uniqueTypes = [...new Set(activities.map(a => a.type))];
-    console.log('🏷️ Map: Available activity types:', uniqueTypes);
-    return uniqueTypes;
-  }, [activities]);
-  
+    // Get event types from backend
+    const eventTypes = [...new Set(activities.map(a => a.type))];
+    console.log('🏷️ Map: Event types from backend:', eventTypes);
+    
+    // Get user interests from BACKEND - CORRECTED DATA ACCESS
+    let userInterestNames: string[] = [];
+    
+    if (userInterestsFromBackend?.interests && Array.isArray(userInterestsFromBackend.interests)) {
+      console.log('🌐 User interests from backend:', userInterestsFromBackend.interests);
+      
+      // Map interest IDs from backend to names
+      userInterestNames = userInterestsFromBackend.interests.map((interestId: number) => {
+        const interest = interests.find(i => i.id === interestId);
+        if (!interest) {
+          console.warn(`⚠️ No match found in interests for backend ID: ${interestId}`);
+          return null;
+        }
+        console.log(`🔍 Mapping backend ID ${interestId} to:`, interest.name);
+        return interest.name;
+      }).filter(Boolean) as string[];
+      
+      console.log('👤 Map: User selected interest names from backend:', userInterestNames);
+    } else if (interestsError) {
+      console.error('❌ Error loading user interests from backend:', interestsError);
+    } else {
+      console.log('⏳ Still loading user interests from backend...');
+    }
+    
+    // Combine both lists and remove duplicates
+    const allTags = [...eventTypes, ...userInterestNames];
+    const uniqueTags = [...new Set(allTags)];
+    
+    console.log('🏷️ Map: Final available tags (from backend):', uniqueTags);
+    return uniqueTags;
+  }, [activities, userInterestsFromBackend, interestsError]);
+
   // Load saved events from localStorage
   useEffect(() => {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -198,25 +239,35 @@ const MapPage = () => {
     localStorage.setItem('joinedEvents', JSON.stringify(joinedIds));
   }, [joinedIds]);
   const filtered = activities.filter((a) => {
-    // Suchfilter
+    // Search filter
     const matchesSearch = search.trim() === '' ||
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.type.toLowerCase().includes(search.toLowerCase());
 
-    // Interest-Filter: Wenn ein Tag ausgewählt ist, filtere nach der entsprechenden Kategorie
-    let matchesInterest = true;
+    // Tag filter - simplified logic
+    let matchesTag = true;
     if (selectedTag) {
-      // Finde das Interest-Objekt für den ausgewählten Tag
-      const selectedInterest = interests.find(interest => interest.name === selectedTag);
-      if (selectedInterest && selectedInterest.category) {
-        // Filtere Events nach der Backend-Kategorie
-        matchesInterest = a.type === selectedInterest.category;
-      } else {
-        matchesInterest = false;
+      // Direct match with event type
+      if (a.type === selectedTag) {
+        matchesTag = true;
+      } 
+      // Match with interest category/name
+      else {
+        const matchingInterest = interests.find(interest => 
+          interest.name === selectedTag
+        );
+        
+        if (matchingInterest) {
+          // Check if event type matches interest category
+          matchesTag = a.type === matchingInterest.category || 
+                      a.category === matchingInterest.category;
+        } else {
+          matchesTag = false;
+        }
       }
     }
 
-    return matchesSearch && matchesInterest;
+    return matchesSearch && matchesTag;
   });
   const isSaved = (id: string) => saved.some((e) => e.id === id);
   const handleSave = (activity: Activity) => {

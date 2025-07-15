@@ -1,0 +1,4 @@
+const availableTags = React.useMemo(() => {
+  const uniqueTypes = [...new Set(activities.map(a => a.type))];
+  return uniqueTypes;
+}, [activities]);
