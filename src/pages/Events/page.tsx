@@ -2,6 +2,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { createEvent, getEvents, joinEvent, type FrontendEvent, type BackendEvent } from '../../config/api';
+
+type FrontendEventCreate = {
+  name: string;
+  type: string;
+  participants: number;
+  time: string;
+  latitude: number | null;
+  longitude: number | null;
+};
 import './page.css';
 
 type Event = FrontendEvent;
@@ -35,10 +44,16 @@ const EventsPage = () => {
 
   useEffect(() => {
     const state = location.state as { selectedPosition?: [number, number] } | null;
-    if (state?.selectedPosition) {
+    if (
+      state?.selectedPosition &&
+      Array.isArray(state.selectedPosition) &&
+      state.selectedPosition.length === 2 &&
+      typeof state.selectedPosition[0] === 'number' &&
+      typeof state.selectedPosition[1] === 'number'
+    ) {
       setForm(f => ({
         ...f,
-        position: state.selectedPosition!,
+        position: state.selectedPosition,
       }));
       navigate(location.pathname, { replace: true, state: null });
     }
@@ -129,6 +144,16 @@ const EventsPage = () => {
       alert('⚠️ Please select a location on the map first! This is a required field.');
       return;
     }
+    // Zusätzliche Typprüfung für Position
+    if (
+      !Array.isArray(form.position) ||
+      form.position.length !== 2 ||
+      typeof form.position[0] !== 'number' ||
+      typeof form.position[1] !== 'number'
+    ) {
+      alert('⚠️ Position ist ungültig. Bitte wähle eine gültige Position auf der Karte.');
+      return;
+    }
     if (form.name.trim() === '') {
       alert('⚠️ Please enter an event name.');
       return;
@@ -138,8 +163,17 @@ const EventsPage = () => {
       return;
     }
     try {
-      console.log('🚀 Creating event with data:', form);
-      await createEvent(form as FrontendEvent);
+      // Explizit latitude/longitude an createEvent übergeben, nicht mehr position
+      const payload: FrontendEventCreate = {
+        name: form.name,
+        type: form.type,
+        participants: form.participants,
+        time: form.time,
+        latitude: form.position ? form.position[0] : null,
+        longitude: form.position ? form.position[1] : null,
+      };
+      console.log('🚀 Creating event with data:', payload);
+      await createEvent(payload as any);
       console.log('✅ Event successfully created:');
       alert(`✅ Event "${form.name}" successfully created!`);
       await loadEventsFromBackend();
@@ -286,7 +320,7 @@ const EventsPage = () => {
                 <div className="event-info">
                   <h3>{event.name}</h3>
                   <p>🏃 {event.type} • 🕐 {event.time} • 👥 {event.participants} participants</p>
-                  <p>📍 Mittweida [{event.position[0].toFixed(3)}, {event.position[1].toFixed(3)}]</p>
+                  <p>📍 Mittweida [{event.latitude?.toFixed(3) ?? 'n/a'}, {event.longitude?.toFixed(3) ?? 'n/a'}]</p>
                   <small className="event-id">Backend-ID: {event.id}</small>
                 </div>
                 <div className="event-actions">

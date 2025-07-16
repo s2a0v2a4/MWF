@@ -55,12 +55,14 @@ const typeToCategoryMap: Record<string, string> = {
 export type FrontendEvent = {
   id?: string;
   name: string;
-  position: [number, number];
+  type: string;
   participants: number;
   time: string;
-  type: string;
-  description?: string;         
-  category?: string;            
+  position?: [number, number] | null;
+  latitude?: number;
+  longitude?: number;
+  description?: string;
+  category?: string;
 }
 
 // Backend Event Type 
@@ -84,8 +86,8 @@ export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEv
   time: frontendEvent.time,
   type: frontendEvent.type,
   participants: frontendEvent.participants,  // Direkt verwenden ohne Fallback
-  latitude: frontendEvent.position[0],   // GPS-Koordinaten aus position array
-  longitude: frontendEvent.position[1]  
+  latitude: typeof frontendEvent.latitude === 'number' ? frontendEvent.latitude : (frontendEvent.position ? frontendEvent.position[0] : undefined),
+  longitude: typeof frontendEvent.longitude === 'number' ? frontendEvent.longitude : (frontendEvent.position ? frontendEvent.position[1] : undefined)
 })
 
 // Event API 
@@ -98,6 +100,7 @@ export const createEvent = async (eventData: FrontendEvent): Promise<BackendEven
   console.log('🔄 Mapping Frontend → Backend:', { frontendEvent: eventData, backendEvent: backendData })
   console.log('🔍 Backend participants value:', backendData.participants, 'Type:', typeof backendData.participants);
   
+  console.log('📦 Payload to backend (JSON):', JSON.stringify(backendData));
   const response = await apiCall('/events', {
     method: 'POST',
     body: JSON.stringify(backendData)
