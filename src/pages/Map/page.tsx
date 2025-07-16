@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEvents, type BackendEvent } from '../../config/api';
 import { interests } from '../../data/interests';
+import useSWR from 'swr';
 const activityIcons: Record<string, string> = {
   Swimming: '/icons/outline/swimming.svg',
   Picnic: '/icons/outline/picnic.svg',
@@ -13,10 +14,10 @@ const activityIcons: Record<string, string> = {
   Theater: '/icons/outline/theater.svg',
   Hiking: '/icons/outline/hiking.svg',
   Dog: '/icons/outline/dog.svg',
-  Walking: '/icons/outline/hiking.svg',    // Walking verwendet Hiking-Icon
-  Concert: '/icons/outline/theater.svg',   // Concert verwendet Theater-Icon
-  Exhibition: '/icons/outline/theater.svg', // Exhibition verwendet Theater-Icon
-  Sports: '/icons/outline/cycling.svg',    // Sports verwendet Cycling-Icon
+  Walking: '/icons/outline/hiking.svg',    
+  Concert: '/icons/outline/theater.svg',   
+  Exhibition: '/icons/outline/theater.svg', 
+  Sports: '/icons/outline/cycling.svg',    
 };
 const activityColors: Record<string, string> = {
   Swimming: '#007BFF',
@@ -25,10 +26,10 @@ const activityColors: Record<string, string> = {
   Theater: '#FF4136',
   Hiking: '#1E8449',
   Dog: '#117A65',
-  Walking: '#8B4513',     // Braun für Walking
-  Concert: '#9B59B6',     // Lila für Concert
-  Exhibition: '#E67E22',  // Orange für Exhibition
-  Sports: '#3498DB',      // Blau für Sports
+  Walking: '#8B4513',     
+  Concert: '#9B59B6',     
+  Exhibition: '#E67E22',  
+  Sports: '#3498DB',     
 };
 type Activity = {
   id: string;
@@ -39,6 +40,7 @@ type Activity = {
   type: string;
   description: string;
   category: string;
+  date?: string; // Add date property
 };
 const createIcon = (activity: Activity) => {
   const color = activityColors[activity.type] || '#555';
@@ -76,12 +78,24 @@ const MapPage = () => {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem('darkMode') === 'true'
   );
-
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   // Backend Events State
   const [backendEvents, setBackendEvents] = useState<BackendEvent[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
   const [eventLoadError, setEventLoadError] = useState<string | null>(null);
-
+  // Get user location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        },
+        (err) => {
+          console.warn('Geolocation error:', err);
+        }
+      );
+    }
+  }, []);
   // 🔄 Load Events from Backend
   const loadEventsFromBackend = async () => {
     try {
@@ -108,13 +122,11 @@ const MapPage = () => {
   useEffect(() => {
     loadEventsFromBackend();
 
-    // Auto-refresh when window gets focus (e.g., returning from event creation)
     const handleFocus = () => {
       console.log('🔄 Map: Window focused, refreshing events...');
       loadEventsFromBackend();
     };
 
-    // Listen for custom event when new events are created
     const handleEventCreated = () => {
       console.log('🔄 Map: New event created, refreshing...');
       loadEventsFromBackend();
@@ -129,16 +141,21 @@ const MapPage = () => {
     };
   }, []);
 
-  // Convert Backend-Events to Frontend-Format mit echten oder unique Positionen
   const activities = Array.isArray(backendEvents)
-    ? backendEvents.map((e: BackendEvent, index: number) => {
-        console.log(`🗺️ Converting backend event ${index + 1}:`, e);
-        
-        // Use real coordinates from backend (now always available)
+  ? backendEvents
+      .map((e: BackendEvent, index: number) => {
+        // Defensive: Prüfe, ob latitude und longitude gültig sind
+        if (
+          typeof e.latitude !== 'number' ||
+          typeof e.longitude !== 'number' ||
+          isNaN(e.latitude) ||
+          isNaN(e.longitude)
+        ) {
+          console.warn(`⚠️ Event ${e.id} skipped: Invalid coordinates`, e.latitude, e.longitude);
+          return null;
+        }
         const eventPosition: [number, number] = [e.latitude, e.longitude];
-        console.log(`✅ Using real GPS coordinates for map event ${index + 1}:`, eventPosition);
-        
-        const activity = {
+        const activity: Activity = {
           id: e.id.toString(),
           name: e.title,
           type: e.type,
@@ -147,30 +164,46 @@ const MapPage = () => {
           position: eventPosition,
           description: e.description,
           category: e.category,
+          date: e.date,
         };
-        
-        console.log(`🗺️ Event ${index + 1} final position:`, activity.position);
         return activity;
       })
-    : [];
+      .filter(Boolean) // Entfernt alle null-Einträge
+  : [];
 
-  // Debug: Log converted activities
   useEffect(() => {
     console.log('🗺️ Map: Converted activities:', activities);
     console.log('🗺️ Map: Activities count:', activities.length);
   }, [activities]);
 
-  // Create tags based on activity types
+  const { data: userInterestsFromBackend, error: interestsError } = useSWR(
+    '/api/interests', // ✅ Korrekte Route (nicht /api/user/interests)
+    async () => {
+      const response = await fetch('/api/interests'); 
+      return response.json();
+    }
+  );
+
   const availableTags = React.useMemo(() => {
-    console.log('🔄 Map: Creating tags from activities');
-    
-    // Hole alle verfügbaren Activity-Typen aus den Events
-    const uniqueTypes = [...new Set(activities.map(a => a.type))];
-    console.log('🏷️ Map: Available activity types:', uniqueTypes);
-    return uniqueTypes;
-  }, [activities]);
-  
-  // Load saved events from localStorage
+    console.log('🔄 Map: Creating tags from activities and backend interests');
+
+    let userInterestNames: string[] = [];
+    if (userInterestsFromBackend?.interests && Array.isArray(userInterestsFromBackend.interests)) {
+      userInterestNames = userInterestsFromBackend.interests.map((interestId: number) => {
+        const interest = interests.find(i => i.id === interestId);
+        return interest?.name ?? null;
+      }).filter(Boolean) as string[];
+    }
+
+    const eventTypes = [...new Set(activities.map(a => a.type))];
+    if (userInterestNames.length > 0) {
+      console.log('👤 Only showing user interests as tags:', userInterestNames);
+      return userInterestNames;
+    }
+    console.log('🏷️ No interests selected, showing all event types:', eventTypes);
+    return eventTypes;
+  }, [activities, userInterestsFromBackend, interestsError]);
+
   useEffect(() => {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (raw) {
@@ -180,7 +213,6 @@ const MapPage = () => {
         setSaved([]);
       }
     }
-    // Load joinedIds from localStorage
     const joinedRaw = localStorage.getItem('joinedEvents');
     if (joinedRaw) {
       try {
@@ -190,52 +222,64 @@ const MapPage = () => {
       }
     }
   }, []);
-  // Save to localStorage when saved changes
+
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(saved));
   }, [saved]);
+
   useEffect(() => {
     localStorage.setItem('joinedEvents', JSON.stringify(joinedIds));
   }, [joinedIds]);
-  const filtered = activities.filter((a) => {
-    // Suchfilter
-    const matchesSearch = search.trim() === '' ||
-      a.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.type.toLowerCase().includes(search.toLowerCase());
 
-    // Interest-Filter: Wenn ein Tag ausgewählt ist, filtere nach der entsprechenden Kategorie
-    let matchesInterest = true;
+  const filtered = activities.filter((a) => {
+    // Defensive: handle missing/null/undefined fields
+    const name = typeof a.name === 'string' ? a.name : '';
+    const type = typeof a.type === 'string' ? a.type : '';
+    const category = typeof a.category === 'string' ? a.category : '';
+
+    // Search filter
+    const matchesSearch = search.trim() === '' ||
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      type.toLowerCase().includes(search.toLowerCase());
+
+    // Tag filter
+    let matchesTag = true;
     if (selectedTag) {
-      // Finde das Interest-Objekt für den ausgewählten Tag
-      const selectedInterest = interests.find(interest => interest.name === selectedTag);
-      if (selectedInterest && selectedInterest.category) {
-        // Filtere Events nach der Backend-Kategorie
-        matchesInterest = a.type === selectedInterest.category;
+      if (type === selectedTag) {
+        matchesTag = true;
       } else {
-        matchesInterest = false;
+        const matchingInterest = interests.find(interest => 
+          interest.name === selectedTag
+        );
+        if (matchingInterest) {
+          matchesTag = type === matchingInterest.category || 
+                      category === matchingInterest.category;
+        } else {
+          matchesTag = false;
+        }
       }
     }
-
-    return matchesSearch && matchesInterest;
+    return matchesSearch && matchesTag;
   });
+
   const isSaved = (id: string) => saved.some((e) => e.id === id);
   const handleSave = (activity: Activity) => {
     if (!isSaved(activity.id)) {
       setSaved((prev) => [...prev, activity]);
     }
   };
+
   const handleRemove = (id: string) => {
     setSaved((prev) => prev.filter((e) => e.id !== id));
   };
-  // Join-Button: Nur einmal pro Event, persistiert im LocalStorage
+
   const hasJoined = (id: string) => joinedIds.includes(id);
   const handleJoin = async (id: string) => {
     if (hasJoined(id)) return;
     await fetch(`/api/events/${id}/join`, { method: 'POST' });
     setJoinedIds((prev) => [...prev, id]);
-    // TODO: Reload events after joining
   };
-  // Klick außerhalb schließt das Menü
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -252,7 +296,6 @@ const MapPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [profileMenuOpen]);
-  // Darkmode toggle
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add('darkmode');
@@ -262,12 +305,13 @@ const MapPage = () => {
       localStorage.setItem('darkMode', 'false');
     }
   }, [darkMode]);
+
   return (
     <div className={`map-container ${darkMode ? 'darkmode' : ''}`}>
       <nav className={`top-nav ${darkMode ? 'darkmode' : ''}`}>
         <div className="nav-content">
           <span className={`nav-title ${darkMode ? 'darkmode' : ''}`}>
-            Mittweida Events Map ({activities.length} Events)
+            Mittweida Events
           </span>
           <button
             onClick={loadEventsFromBackend}
@@ -330,7 +374,7 @@ const MapPage = () => {
             fontSize: '14px',
             color: '#666'
           }}>
-            <span>📍 Events geladen: {activities.length}</span>
+            <span>📍 Events loaded: {activities.length}</span>
             {isLoadingEvents && <span>⏳ Loading...</span>}
             {eventLoadError && <span style={{ color: '#dc3545' }}>❌ {eventLoadError}</span>}
           </div>
@@ -347,8 +391,8 @@ const MapPage = () => {
           {availableTags.length === 0 && !isLoadingEvents && (
             <div className="no-interests-message">
               {activities.length === 0 
-                ? "Keine Events vom Backend geladen" 
-                : "Alle Event-Typen werden angezeigt"
+                ? "An event loaded from the backend" 
+                : "All event types are displayed"
               }
             </div>
           )}
@@ -377,16 +421,24 @@ const MapPage = () => {
       <div className="main-content">
         {activeNav === 'explore' ? (
           <MapContainer
-            center={[50.9866, 12.9716]}
+            center={userLocation || [50.9866, 12.9716]}
             zoom={14}
             className="map-container-leaflet"
             scrollWheelZoom={true}
             dragging={true}
           >
             <TileLayer
-              attribution="© OpenStreetMap"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             />
+            {/* User location marker */}
+            {userLocation && (
+              <Marker position={userLocation}>
+                <Popup>
+                  <span>Your current location</span>
+                </Popup>
+              </Marker>
+            )}
             {filtered.map((activity, i) => (
               <React.Fragment key={activity.id}>
                 <Circle
@@ -410,11 +462,18 @@ const MapPage = () => {
                     <div className="popup-content">
                       <span className="popup-event-name">{activity.name}</span>
                       <br />
+                      {/* Show date if available, formatted as TT.MM.JJJJ */}
+                      {activity.date ? (
+                        <>
+                          📅 {(() => { const d = activity.date.split('-'); return d.length === 3 ? `${d[2]}.${d[1]}.${d[0]}` : activity.date; })()}
+                          <br />
+                        </>
+                      ) : null}
                       � {activity.description}
                       <br />
                       🏷️ {activity.category}
                       <br />
-                      �👥 {activity.people} Persons
+                      �👥 {activity.people} People
                       <br />
                       🕒 {activity.time}
                       <br />
@@ -442,7 +501,7 @@ const MapPage = () => {
           </MapContainer>
         ) : (
           <div className="saved-events-container">
-            <h2 className="saved-events-title">Gespeicherte Events</h2>
+            <h2 className="saved-events-title">Saved events</h2>
             {saved.length === 0 ? (
               <p className="no-events-message">You have not saved any events yet. </p>
             ) : (
@@ -471,7 +530,6 @@ const MapPage = () => {
     </div>
   );
 };
-// MenüItem-Komponente
 function MenuItem({ label, icon, onClick }: { label: string; icon: string; onClick: () => void }) {
   return (
     <button
@@ -485,5 +543,3 @@ function MenuItem({ label, icon, onClick }: { label: string; icon: string; onCli
   );
 }
 export default MapPage;
-
-

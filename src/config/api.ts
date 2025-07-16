@@ -5,7 +5,7 @@ const getApiUrl = () => {
   
   return import.meta.env.VITE_API_URL 
     ? `${import.meta.env.VITE_API_URL}/api`
-    : 'http://localhost:5000/api'  // Backend läuft auf Port 5000
+    : 'http://localhost:5000/api'  // Backend Port 5000
 }
 
 export const API_BASE_URL = getApiUrl()
@@ -39,7 +39,6 @@ export const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   }
 }
 
-// 🎯 Type → Category Mapping für Backend
 const typeToCategoryMap: Record<string, string> = {
   'Walking': 'Sport',
   'Picnic': 'Sport', 
@@ -52,19 +51,21 @@ const typeToCategoryMap: Record<string, string> = {
   'Theater': 'Kunst'
 }
 
-// 📊 Frontend Event Type
+// Frontend Event Type
 export type FrontendEvent = {
   id?: string;
   name: string;
-  position: [number, number];
+  type: string;
   participants: number;
   time: string;
-  type: string;
-  description?: string;          // ✅ Neu hinzugefügt
-  category?: string;             // ✅ Neu hinzugefügt
+  position?: [number, number] | null;
+  latitude?: number;
+  longitude?: number;
+  description?: string;
+  category?: string;
 }
 
-// 📊 Backend Event Type (Updated to match backend structure)
+// Backend Event Type 
 export type BackendEvent = {
   id: number;
   title: string;
@@ -73,8 +74,9 @@ export type BackendEvent = {
   time: string;
   type: string;
   participants: number;
-  latitude: number;              // ✅ Echte GPS-Koordinaten vom Backend
-  longitude: number;             // ✅ Echte GPS-Koordinaten vom Backend
+  latitude: number;              //  Echte GPS-Koordinaten vom Backend
+  longitude: number;             //  Echte GPS-Koordinaten vom Backend
+  date?: string;                 // Datum im Format YYYY-MM-DD (optional, falls vorhanden)
 }
 
 // 🔄 Frontend → Backend Mapping
@@ -84,12 +86,12 @@ export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEv
   category: frontendEvent.category || typeToCategoryMap[frontendEvent.type] || 'Sport',
   time: frontendEvent.time,
   type: frontendEvent.type,
-  participants: frontendEvent.participants,  // ✅ Direkt verwenden ohne Fallback
-  latitude: frontendEvent.position[0],   // GPS-Koordinaten aus position array
-  longitude: frontendEvent.position[1]   // GPS-Koordinaten aus position array
+  participants: frontendEvent.participants,  // Direkt verwenden ohne Fallback
+  latitude: typeof frontendEvent.latitude === 'number' ? frontendEvent.latitude : (frontendEvent.position ? frontendEvent.position[0] : undefined),
+  longitude: typeof frontendEvent.longitude === 'number' ? frontendEvent.longitude : (frontendEvent.position ? frontendEvent.position[1] : undefined)
 })
 
-// 🚀 Event API Functions
+// Event API 
 export const createEvent = async (eventData: FrontendEvent): Promise<BackendEvent> => {
   console.log('🔍 Frontend Event Data before mapping:', eventData);
   console.log('🔍 Participants value:', eventData.participants, 'Type:', typeof eventData.participants);
@@ -99,6 +101,7 @@ export const createEvent = async (eventData: FrontendEvent): Promise<BackendEven
   console.log('🔄 Mapping Frontend → Backend:', { frontendEvent: eventData, backendEvent: backendData })
   console.log('🔍 Backend participants value:', backendData.participants, 'Type:', typeof backendData.participants);
   
+  console.log('📦 Payload to backend (JSON):', JSON.stringify(backendData));
   const response = await apiCall('/events', {
     method: 'POST',
     body: JSON.stringify(backendData)
@@ -157,7 +160,7 @@ export const getEvents = async (): Promise<BackendEvent[]> => {
   return events
 }
 
-// 🤝 Join Event Function
+// Join Event
 export const joinEvent = async (eventId: string | number): Promise<BackendEvent> => {
   const response = await apiCall(`/events/${eventId}/join`, {
     method: 'POST'
@@ -173,7 +176,7 @@ export const joinEvent = async (eventId: string | number): Promise<BackendEvent>
   return result
 }
 
-// 🗑️ Delete Event Function
+// Delete Event Function
 export const deleteEvent = async (eventId: string | number): Promise<void> => {
   const response = await apiCall(`/events/${eventId}`, {
     method: 'DELETE'

@@ -1,4 +1,3 @@
-// src/components/Profile.tsx
 import React from 'react';
 
 const mockUser = {

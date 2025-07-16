@@ -1,27 +1,20 @@
 import useSWR from 'swr';
 import { deleteEvent, type BackendEvent } from '../../config/api';
 import './EventAdmin.css';
-
-// SWR Fetcher function
 const fetcher = async (url: string): Promise<BackendEvent[]> => {
   console.log('SWR Fetcher: Fetching from:', url);
   const response = await fetch(url);
-  
   console.log('SWR Fetcher: Response status:', response.status);
-  
   if (!response.ok) {
     const errorText = await response.text();
     console.error('SWR Fetcher: Error response:', errorText);
     throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
-  
   const data = await response.json();
   console.log('SWR Fetcher: Successfully fetched', data.length, 'events');
   return data;
 };
-
 const EventAdmin = () => {
-  // SWR für Events mit automatischem Caching und Updates
   const {
     data: events,
     error: swrError,
@@ -39,35 +32,24 @@ const EventAdmin = () => {
       console.log('SWR Success: Loaded', data?.length || 0, 'events');
     }
   });
-
-  // Event löschen mit SWR mutate
   const handleDeleteEvent = async (eventId: number) => {
     if (!confirm(`Are you sure you want to delete event with ID ${eventId}?`)) {
       return;
     }
-
     try {
       console.log('Deleting event:', eventId);
-      
       await deleteEvent(eventId);
       console.log('Event deleted successfully');
-      
-      // SWR Cache invalidieren und neu laden
       await mutate();
-      
     } catch (err) {
       console.error('Error deleting event:', err);
       alert(`Failed to delete event: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
-
-  // Manual refresh mit SWR
   const handleRefresh = async () => {
     console.log('Manual refresh triggered');
     await mutate();
   };
-
-  // Test direkter Fetch (für Debug)
   const testDirectFetch = async () => {
     try {
       console.log('Testing direct fetch...');
@@ -80,14 +62,12 @@ const EventAdmin = () => {
       alert(`Direct fetch failed: ${err}`);
     }
   };
-
   return (
     <div className="event-admin-page">
       <div className="admin-container">
         <div className="admin-header">
           <h1>Event Administration</h1>
           <p>Manage events from backend (http://localhost:5000/api/events)</p>
-          
           <div className="admin-actions">
             <button 
               onClick={handleRefresh} 
@@ -96,7 +76,6 @@ const EventAdmin = () => {
             >
               {isLoading ? 'Loading...' : 'Refresh Events (SWR)'}
             </button>
-            
             <button 
               onClick={testDirectFetch}
               className="refresh-btn test-fetch-btn"
@@ -106,13 +85,11 @@ const EventAdmin = () => {
             </button>
           </div>
         </div>
-
         {swrError && (
           <div className="error-message">
             {swrError.message}
           </div>
         )}
-
         <div className="events-overview">
           <h2>Backend Events Overview</h2>
           
@@ -135,7 +112,6 @@ const EventAdmin = () => {
                   <strong>Backend URL:</strong> http://localhost:5000/api/events
                 </div>
               </div>
-
               <div className="events-table">
                 <table>
                   <thead>
@@ -195,7 +171,6 @@ const EventAdmin = () => {
             </>
           )}
         </div>
-
         <div className="admin-info">
           <h3>Information</h3>
           <ul>
@@ -209,9 +184,7 @@ const EventAdmin = () => {
     </div>
   );
 };
-
 export default EventAdmin;
-
 export type BackendEvent = {
   id: number;
   title: string;
@@ -220,10 +193,9 @@ export type BackendEvent = {
   time: string;
   type: string;
   participants: number;
-  latitude: number;              // Echte GPS-Koordinaten
-  longitude: number;             // Echte GPS-Koordinaten
+  latitude: number;              
+  longitude: number;             
 }
-
 type FrontendEvent = {
   name: string;
   description?: string;
@@ -233,7 +205,6 @@ type FrontendEvent = {
   participants?: number;
   position: [number, number];
 }
-
 const typeToCategoryMap: Record<string, string> = {
   'Walking': 'Sport',
   'Cycling': 'Sport',
@@ -242,7 +213,6 @@ const typeToCategoryMap: Record<string, string> = {
   'Theater': 'Culture',
   'Picnic': 'Social'
 };
-
 export const mapToBackendFormat = (frontendEvent: FrontendEvent): Omit<BackendEvent, 'id'> => ({
   title: frontendEvent.name,
   description: frontendEvent.description || `${frontendEvent.type} Event in Mittweida`,

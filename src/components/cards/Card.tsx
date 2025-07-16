@@ -1,4 +1,3 @@
-// src/components/Card.tsx
 import React from 'react';
 import './Card.css';
 
@@ -11,9 +10,6 @@ const Card: React.FC<CardProps> = ({ children }) => {
 };
 
 export default Card;
-
-
-
 // type CardProps = {
 //   children: ReactNode;
 // };
