@@ -302,7 +302,7 @@ const MapPage = () => {
       <nav className={`top-nav ${darkMode ? 'darkmode' : ''}`}>
         <div className="nav-content">
           <span className={`nav-title ${darkMode ? 'darkmode' : ''}`}>
-            Mittweida Events Map ({activities.length} Events)
+            Mittweida Events
           </span>
           <button
             onClick={loadEventsFromBackend}
