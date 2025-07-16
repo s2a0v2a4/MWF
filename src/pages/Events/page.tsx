@@ -169,19 +169,27 @@ const EventsPage = () => {
       return;
     }
     try {
-      // Explizit latitude/longitude an createEvent übergeben, nicht mehr position
-      const payload: FrontendEventCreate = {
+      // Sende Payload mit position als Array [lat, lon]
+      const payload = {
         name: form.name,
         type: form.type,
-        participants: form.participants,
         time: form.time,
         date: form.date,
-        latitude: form.position ? form.position[0] : null,
-        longitude: form.position ? form.position[1] : null,
+        participants: form.participants,
+        position: form.position,
       };
       console.log('🚀 Creating event with data:', payload);
-      await createEvent(payload as any);
-      console.log('✅ Event successfully created:');
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Event creation failed: ${response.status} - ${errorText}`);
+      }
+      const result = await response.json();
+      console.log('✅ Event successfully created:', result);
       alert(`✅ Event "${form.name}" successfully created!`);
       await loadEventsFromBackend();
       setForm({
