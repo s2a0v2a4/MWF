@@ -338,7 +338,7 @@ const EventsPage = () => {
               <div key={event.id} className="events-list-item">
                 <div className="event-info">
                   <h3>{event.name}</h3>
-                  <p>🏃 {event.type} • 🕐 {event.time} • 👥 {event.participants} participants</p>
+                  <p>📅 {event.date ? (() => { const d = event.date.split('-'); return d.length === 3 ? `${d[2]}.${d[1]}.${d[0]}` : event.date; })() : 'n/a'} • 🏃 {event.type} • 🕐 {event.time} • 👥 {event.participants} participants</p>
                   <p>📍 Mittweida [{event.latitude?.toFixed(3) ?? 'n/a'}, {event.longitude?.toFixed(3) ?? 'n/a'}]</p>
                   <small className="event-id">Backend-ID: {event.id}</small>
                 </div>

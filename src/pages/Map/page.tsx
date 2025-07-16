@@ -224,33 +224,33 @@ const MapPage = () => {
   }, [joinedIds]);
 
   const filtered = activities.filter((a) => {
+    // Defensive: handle missing/null/undefined fields
+    const name = typeof a.name === 'string' ? a.name : '';
+    const type = typeof a.type === 'string' ? a.type : '';
+    const category = typeof a.category === 'string' ? a.category : '';
+
     // Search filter
     const matchesSearch = search.trim() === '' ||
-      a.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.type.toLowerCase().includes(search.toLowerCase());
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      type.toLowerCase().includes(search.toLowerCase());
 
     // Tag filter
     let matchesTag = true;
     if (selectedTag) {
-
-      if (a.type === selectedTag) {
+      if (type === selectedTag) {
         matchesTag = true;
-      } 
-
-      else {
+      } else {
         const matchingInterest = interests.find(interest => 
           interest.name === selectedTag
         );
-        
         if (matchingInterest) {
-          matchesTag = a.type === matchingInterest.category || 
-                      a.category === matchingInterest.category;
+          matchesTag = type === matchingInterest.category || 
+                      category === matchingInterest.category;
         } else {
           matchesTag = false;
         }
       }
     }
-
     return matchesSearch && matchesTag;
   });
 
