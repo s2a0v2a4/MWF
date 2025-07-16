@@ -40,6 +40,7 @@ type Activity = {
   type: string;
   description: string;
   category: string;
+  date?: string; // Add date property
 };
 const createIcon = (activity: Activity) => {
   const color = activityColors[activity.type] || '#555';
@@ -143,11 +144,9 @@ const MapPage = () => {
   const activities = Array.isArray(backendEvents)
     ? backendEvents.map((e: BackendEvent, index: number) => {
         console.log(`🗺️ Converting backend event ${index + 1}:`, e);
-        
         const eventPosition: [number, number] = [e.latitude, e.longitude];
         console.log(`✅ Using real GPS coordinates for map event ${index + 1}:`, eventPosition);
-        
-        const activity = {
+        const activity: Activity = {
           id: e.id.toString(),
           name: e.title,
           type: e.type,
@@ -156,8 +155,8 @@ const MapPage = () => {
           position: eventPosition,
           description: e.description,
           category: e.category,
+          date: e.date, // Map date from backend
         };
-        
         console.log(`🗺️ Event ${index + 1} final position:`, activity.position);
         return activity;
       })
@@ -454,11 +453,18 @@ const MapPage = () => {
                     <div className="popup-content">
                       <span className="popup-event-name">{activity.name}</span>
                       <br />
+                      {/* Show date if available, formatted as TT.MM.JJJJ */}
+                      {activity.date ? (
+                        <>
+                          📅 {(() => { const d = activity.date.split('-'); return d.length === 3 ? `${d[2]}.${d[1]}.${d[0]}` : activity.date; })()}
+                          <br />
+                        </>
+                      ) : null}
                       � {activity.description}
                       <br />
                       🏷️ {activity.category}
                       <br />
-                      �👥 {activity.people} Persons
+                      �👥 {activity.people} People
                       <br />
                       🕒 {activity.time}
                       <br />

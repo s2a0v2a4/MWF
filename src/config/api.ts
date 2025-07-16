@@ -76,6 +76,7 @@ export type BackendEvent = {
   participants: number;
   latitude: number;              //  Echte GPS-Koordinaten vom Backend
   longitude: number;             //  Echte GPS-Koordinaten vom Backend
+  date?: string;                 // Datum im Format YYYY-MM-DD (optional, falls vorhanden)
 }
 
 // 🔄 Frontend → Backend Mapping
