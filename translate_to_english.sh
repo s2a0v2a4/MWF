@@ -61,15 +61,7 @@ sed -i 's/Join-Button: Nur einmal pro Event, persistiert im LocalStorage/Join bu
 
 echo "✅ Map page translated"
 
-# 4. Profile Components
-echo "📝 Translating Profile components..."
-sed -i 's/Saved Events/Saved Events/g' src/pages/Profile/_components/NavBar.tsx
-sed -i 's/Create Event/Create Event/g' src/pages/Profile/_components/NavBar.tsx
 
-echo "✅ Profile components translated"
-
-# 5. API and Config files
-echo "📝 Translating API descriptions..."
 sed -i 's/Generiert: "{type} Event in Mittweida"/Generated: "{type} Event in Mittweida"/g' src/config/api.ts
 
 echo "✅ API translations completed"

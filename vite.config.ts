@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
   
   if (mode === 'development') {
     return {
+
+
+
       ...baseConfig,
       server: {
         ...baseConfig.server,
@@ -21,11 +24,12 @@ export default defineConfig(({ mode }) => {
             target: env.VITE_API_URL || 'http://localhost:5000',
             changeOrigin: true,
             secure: false,
+            // return {
           }
         }
       }
     }
   }
-  
+
   return baseConfig
 })

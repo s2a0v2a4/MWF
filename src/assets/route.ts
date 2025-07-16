@@ -10,7 +10,7 @@ type Event = {
   comments: string[];
 };
 
-// In-memory Events Speicher (bei Server-Neustart leer)
+// In-memory Events Speicher
 let events: Event[] = [];
 
 export async function GET() {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   ) {
     return NextResponse.json({ error: 'Ungültige Daten' }, { status: 400 });
   }
-  // events.push(event);
+  // events.push;
   const event: Event = {
     id: `event_${Date.now()}`, // ID generieren
     name: newEvent.name,
