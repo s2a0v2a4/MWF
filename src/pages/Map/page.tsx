@@ -142,10 +142,19 @@ const MapPage = () => {
   }, []);
 
   const activities = Array.isArray(backendEvents)
-    ? backendEvents.map((e: BackendEvent, index: number) => {
-        console.log(`🗺️ Converting backend event ${index + 1}:`, e);
+  ? backendEvents
+      .map((e: BackendEvent, index: number) => {
+        // Defensive: Prüfe, ob latitude und longitude gültig sind
+        if (
+          typeof e.latitude !== 'number' ||
+          typeof e.longitude !== 'number' ||
+          isNaN(e.latitude) ||
+          isNaN(e.longitude)
+        ) {
+          console.warn(`⚠️ Event ${e.id} skipped: Invalid coordinates`, e.latitude, e.longitude);
+          return null;
+        }
         const eventPosition: [number, number] = [e.latitude, e.longitude];
-        console.log(`✅ Using real GPS coordinates for map event ${index + 1}:`, eventPosition);
         const activity: Activity = {
           id: e.id.toString(),
           name: e.title,
@@ -155,12 +164,12 @@ const MapPage = () => {
           position: eventPosition,
           description: e.description,
           category: e.category,
-          date: e.date, // Map date from backend
+          date: e.date,
         };
-        console.log(`🗺️ Event ${index + 1} final position:`, activity.position);
         return activity;
       })
-    : [];
+      .filter(Boolean) // Entfernt alle null-Einträge
+  : [];
 
   useEffect(() => {
     console.log('🗺️ Map: Converted activities:', activities);
