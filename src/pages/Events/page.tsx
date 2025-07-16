@@ -8,6 +8,7 @@ type FrontendEventCreate = {
   type: string;
   participants: number;
   time: string;
+  date: string;
   latitude: number | null;
   longitude: number | null;
 };
@@ -29,6 +30,7 @@ const EventsPage = () => {
     type: 'Walking',
     participants: 1,
     time: '',
+    date: '',
     position: null as [number, number] | null
   });
 
@@ -162,6 +164,10 @@ const EventsPage = () => {
       alert('⚠️ Please enter a valid time in HH:mm format.');
       return;
     }
+    if (!form.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      alert('⚠️ Please enter a valid date in YYYY-MM-DD format.');
+      return;
+    }
     try {
       // Explizit latitude/longitude an createEvent übergeben, nicht mehr position
       const payload: FrontendEventCreate = {
@@ -169,6 +175,7 @@ const EventsPage = () => {
         type: form.type,
         participants: form.participants,
         time: form.time,
+        date: form.date,
         latitude: form.position ? form.position[0] : null,
         longitude: form.position ? form.position[1] : null,
       };
@@ -182,6 +189,7 @@ const EventsPage = () => {
         type: 'Walking',
         participants: 1,
         time: '',
+        date: '',
         position: null
       });
       setTimeParts(['', '', '', '']);
@@ -270,6 +278,18 @@ const EventsPage = () => {
           </div>
         </div>
         <div className="form-group">
+          <label className="required-label">Date (Required):</label>
+          <input
+            type="date"
+            value={form.date}
+            onChange={e => setForm({ ...form, date: e.target.value })}
+            className="events-input"
+            required
+            pattern="\d{4}-\d{2}-\d{2}"
+            title="Please enter a date in the format YYYY-MM-DD"
+          />
+        </div>
+        <div className="form-group">
           <label className="required-label">Time (Required):</label>
           <div className="time-input-wrapper">
             {timeParts.map((ch, i) => (
@@ -289,7 +309,6 @@ const EventsPage = () => {
               </React.Fragment>
             ))}
           </div>
-         
         </div>
         <button 
           type="submit"
