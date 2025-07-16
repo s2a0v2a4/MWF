@@ -9,7 +9,7 @@ import SelectLocation from './pages/Events/map';
 import NameInputPage from './pages/Login/page';
 import InterestSelectionPage from './pages/Interests/page';
 
-// Simple fallback component for debugging
+// fallback debugging
 const DebugPage = () => (
   <div style={{padding: '20px', color: 'black', background: 'white'}}>
     <h1>Debug Page</h1>
