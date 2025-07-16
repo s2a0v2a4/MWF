@@ -6,9 +6,18 @@ MWF ist das Frontend einer Event-Plattform, mit der Nutzer Veranstaltungen nach 
 Die Anwendung funktioniert sowohl über GitHub Pages als auch lokal – das Backend ist für beide Umgebungen konfiguriert
 
 ---------------------------------------------------------------------------------------------------------------
-
 Füg ein in Terminal bash
 git pull origin main
+
+
+backend commands to dos:
+npm install @nestjs/common @nestjs/core @nestjs/swagger express @types/express --save; npm install @types/node --save-dev
+
+npm run start:dev
+
+Frontend to dos:
+npm install
+npm run dev
 
 ---------------------------------------------------------------------------------------------------------------
 
