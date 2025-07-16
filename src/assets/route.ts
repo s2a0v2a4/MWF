@@ -20,7 +20,6 @@ export async function GET() {
 export async function POST(request: Request) {
   const newEvent = await request.json();
 
-  // Einfaches Validation
   if (
     !newEvent ||
     typeof newEvent.name !== 'string' ||
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
   ) {
     return NextResponse.json({ error: 'Ungültige Daten' }, { status: 400 });
   }
-
+  // events.push(event);
   const event: Event = {
     id: `event_${Date.now()}`, // ID generieren
     name: newEvent.name,
@@ -41,6 +40,5 @@ export async function POST(request: Request) {
   };
 
   events.push(event);
-
   return NextResponse.json(event, { status: 201 });
 }

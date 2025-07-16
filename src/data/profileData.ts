@@ -7,5 +7,4 @@ const profileData = {
   profileLikes: 4,
 };
 
-
 export default profileData;
