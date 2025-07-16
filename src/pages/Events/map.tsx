@@ -17,6 +17,9 @@ const LocationSelector = ({ onSelect }: { onSelect: (pos: [number, number]) => v
   useMapEvents({ click: e => onSelect([e.latlng.lat, e.latlng.lng]) });
   return null;
 };
+ 
+
+
 
 const SelectLocation = () => {
   const [position, setPosition] = useState<[number, number] | null>(null);
