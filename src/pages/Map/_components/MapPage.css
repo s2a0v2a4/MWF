@@ -304,19 +304,23 @@
 
 .main-content {
   width: 100vw;
-  height: calc(100vh - 70px - 48px);
+  height: 100vh;
   max-width: 100vw;
   position: relative;
+  background: transparent;
+  padding-bottom: 56px; /* Höhe der Bottom-Nav, damit Map nicht überlappt wird */
 }
 
 .map-container-leaflet {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
   bottom: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   z-index: 1;
+  background: #fff;
 }
 
 .saved-events-container {
