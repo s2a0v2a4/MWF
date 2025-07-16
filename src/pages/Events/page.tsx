@@ -139,9 +139,9 @@ const EventsPage = () => {
     }
     try {
       console.log('🚀 Creating event with data:', form);
-      const newEvent = await createEvent(form as FrontendEvent);
-      console.log('✅ Event successfully created:', newEvent);
-      alert(`✅ Event "${form.name}" successfully created!\n🆔 Event-ID: ${newEvent.id}\n📍 Category: ${newEvent.category}`);
+      await createEvent(form as FrontendEvent);
+      console.log('✅ Event successfully created:');
+      alert(`✅ Event "${form.name}" successfully created!`);
       await loadEventsFromBackend();
       setForm({
         name: '',
@@ -152,6 +152,7 @@ const EventsPage = () => {
       });
       setTimeParts(['', '', '', '']);
       setTimeFocusedIndex(0);
+      navigate('/map');
     } catch (error) {
       console.error('❌ Error creating event:', error);
       alert(`❌ Error creating event:\n${error instanceof Error ? error.message : 'Unknown error'}`);
