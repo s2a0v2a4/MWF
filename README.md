@@ -135,9 +135,3 @@ Prüft, ob Username, E-Mail und Beschriftungen wie „Nutzername:“ korrekt ang
 
 ---------------------------------------------------------------------------------------------------------------
 
-
-
-npm run build
-git add docs
-git commit -m "Fix: Production API URL"
-git push
